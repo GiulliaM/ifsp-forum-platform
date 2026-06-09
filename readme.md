@@ -6,7 +6,7 @@ Inspirada no Stack Overflow e no LeetCode, a plataforma oferece fórum colaborat
 
 ---
 
-## 👥 Equipe
+## Equipe
 
 | Nome | RA |
 |------|----|
@@ -16,7 +16,7 @@ Inspirada no Stack Overflow e no LeetCode, a plataforma oferece fórum colaborat
 
 ---
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 ```
                         ┌─────────────────┐
@@ -39,7 +39,7 @@ Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre s
 
 ---
 
-## 📦 Microsserviços
+## Microsserviços
 
 | Serviço | Porta | Banco | User Stories |
 |---------|-------|-------|--------------|
@@ -50,7 +50,7 @@ Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre s
 
 ---
 
-## ⚙️ Pré-requisitos
+## Pré-requisitos
 
 - Java 17+
 - Maven 3.8+
@@ -59,7 +59,7 @@ Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre s
 
 ---
 
-## 🚀 Como rodar localmente
+## Como rodar localmente
 
 ### 1. Clone o repositório
 
@@ -102,7 +102,7 @@ cd api-gateway && mvn spring-boot:run
 
 ---
 
-## 🔐 Autenticação
+## Autenticação
 
 O `auth-service` gera um **JWT** no login. Todos os endpoints protegidos precisam do token no header:
 
@@ -118,7 +118,7 @@ Os outros serviços **não validam JWT** — só leem esses headers.
 
 ---
 
-## 📋 Endpoints principais
+## Endpoints principais
 
 ### Auth Service (`localhost:8081`)
 | Método | Rota | Descrição | Auth? |
@@ -147,7 +147,7 @@ Os outros serviços **não validam JWT** — só leem esses headers.
 
 ---
 
-## 🗂️ Estrutura de pacotes
+## Estrutura de pacotes
 
 Todos os serviços seguem o mesmo padrão:
 
