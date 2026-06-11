@@ -36,7 +36,7 @@ public class Usuario {
     @Column(name = "termos_aceitos", nullable = false)
     private boolean termosAceitos;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean ativo = true;
 
     @Column(name = "criado_em", updatable = false)
