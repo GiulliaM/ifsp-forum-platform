@@ -8,5 +8,7 @@ import java.util.List;
 public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
 
     List<Comentario> findByTopicoIdOrderByCriadoEmAsc(Long topicoId);
+
+    long countByTopicoId(Long topicoId);
 }
 
