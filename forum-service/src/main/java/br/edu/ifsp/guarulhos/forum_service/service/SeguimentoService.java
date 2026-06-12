@@ -1,6 +1,8 @@
 package br.edu.ifsp.guarulhos.forum_service.service;
 
 import br.edu.ifsp.guarulhos.forum_service.dto.response.TopicoResponse;
+import br.edu.ifsp.guarulhos.forum_service.exception.RecursoNaoEncontradoException;
+import br.edu.ifsp.guarulhos.forum_service.exception.RegraNegocioException;
 import br.edu.ifsp.guarulhos.forum_service.model.Seguimento;
 import br.edu.ifsp.guarulhos.forum_service.model.Topico;
 import br.edu.ifsp.guarulhos.forum_service.repository.SeguimentoRepository;
@@ -24,10 +26,10 @@ public class SeguimentoService {
     * */
     public void seguir(Long topicoId, Long usuarioId){
         Topico topico = topicoRepository.findById(topicoId)
-                .orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tópico não encontrado"));
 
         seguimentoRepository.findByUsuarioIdAndTopicoId(usuarioId, topicoId)
-                .ifPresent(s -> { throw new RuntimeException("Você já segue este tópico"); });
+                .ifPresent(s -> { throw new RegraNegocioException("Você já segue este tópico"); });
 
         Seguimento seguimento = Seguimento.builder()
                 .usuarioId(usuarioId)
@@ -41,7 +43,7 @@ public class SeguimentoService {
     * */
     public void deixarDeSeguir(Long topicoId, Long usuarioId){
         Seguimento seguimento = seguimentoRepository.findByUsuarioIdAndTopicoId(usuarioId, topicoId)
-                .orElseThrow(() -> new RuntimeException("Você não segue este tópico"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Você não segue este tópico"));
         seguimentoRepository.delete(seguimento);
     }
 

@@ -1,5 +1,6 @@
 package br.edu.ifsp.guarulhos.forum_service.service;
 
+import br.edu.ifsp.guarulhos.forum_service.exception.RecursoNaoEncontradoException;
 import br.edu.ifsp.guarulhos.forum_service.model.Like;
 import br.edu.ifsp.guarulhos.forum_service.model.enums.TipoLike;
 import br.edu.ifsp.guarulhos.forum_service.repository.ComentarioRepository;
@@ -22,7 +23,7 @@ public class LikeService {
     * */
     public long alternarLikeTopico(Long topicoId, Long usuarioId){
         if(!topicoRepository.existsById(topicoId)){
-            throw new RuntimeException("Tópico não encontrado");
+            throw new RecursoNaoEncontradoException("Tópico não encontrado");
         }
         alternar(usuarioId, TipoLike.TOPICO, topicoId);
         return likeRepository.countByTipoAndReferenciaId(TipoLike.TOPICO, topicoId);
@@ -33,7 +34,7 @@ public class LikeService {
     * */
     public long alternarLikeComentario(Long comentarioId, Long usuarioId){
         if(!comentarioRepository.existsById(comentarioId)){
-            throw new RuntimeException("Comentário não encontrado");
+            throw new RecursoNaoEncontradoException("Comentário não encontrado");
         }
         alternar(usuarioId, TipoLike.COMENTARIO, comentarioId);
         return likeRepository.countByTipoAndReferenciaId(TipoLike.COMENTARIO, comentarioId);

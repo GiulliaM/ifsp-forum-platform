@@ -2,6 +2,9 @@ package br.edu.ifsp.guarulhos.forum_service.service;
 
 import br.edu.ifsp.guarulhos.forum_service.dto.request.ComentarioRequest;
 import br.edu.ifsp.guarulhos.forum_service.dto.response.ComentarioResponse;
+import br.edu.ifsp.guarulhos.forum_service.exception.AcessoNegadoException;
+import br.edu.ifsp.guarulhos.forum_service.exception.RecursoNaoEncontradoException;
+import br.edu.ifsp.guarulhos.forum_service.exception.RegraNegocioException;
 import br.edu.ifsp.guarulhos.forum_service.model.Comentario;
 import br.edu.ifsp.guarulhos.forum_service.model.Topico;
 import br.edu.ifsp.guarulhos.forum_service.model.enums.TipoLike;
@@ -32,10 +35,10 @@ public class ComentarioService {
     * */
     public ComentarioResponse criar(Long topicoId, ComentarioRequest request, Long autorId){
         Topico topico = topicoRepository.findById(topicoId)
-                .orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tópico não encontrado"));
 
         if(topico.isEncerrado()){
-            throw new RuntimeException("Este tópico está encerrado e não aceita novos comentários");
+            throw new RegraNegocioException("Este tópico está encerrado e não aceita novos comentários");
         }
 
         Comentario comentario = Comentario.builder()
@@ -46,7 +49,7 @@ public class ComentarioService {
 
         if(request.getParentId() != null){
             Comentario parent = comentarioRepository.findById(request.getParentId())
-                    .orElseThrow(() -> new RuntimeException("Comentário pai não encontrado"));
+                    .orElseThrow(() -> new RecursoNaoEncontradoException("Comentário pai não encontrado"));
             comentario.setParent(parent);
         }
 
@@ -84,9 +87,9 @@ public class ComentarioService {
 
     private Comentario buscarValidandoAutor(Long id, Long autorId){
         Comentario comentario = comentarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Comentário não encontrado"));
         if(!comentario.getAutorId().equals(autorId)){
-            throw new RuntimeException("Você só pode alterar os seus próprios comentários");
+            throw new AcessoNegadoException("Você só pode alterar os seus próprios comentários");
         }
         return comentario;
     }
@@ -94,7 +97,7 @@ public class ComentarioService {
     private void validarPrazo(Comentario comentario){
         long minutos = Duration.between(comentario.getCriadoEm(), LocalDateTime.now()).toMinutes();
         if(minutos >= MINUTOS_PARA_EDITAR){
-            throw new RuntimeException("O prazo de 30 minutos para alterar o comentário já passou");
+            throw new RegraNegocioException("O prazo de 30 minutos para alterar o comentário já passou");
         }
     }
 

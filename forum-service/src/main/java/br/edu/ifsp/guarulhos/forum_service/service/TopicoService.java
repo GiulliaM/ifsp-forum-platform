@@ -2,6 +2,8 @@ package br.edu.ifsp.guarulhos.forum_service.service;
 
 import br.edu.ifsp.guarulhos.forum_service.dto.request.TopicoRequest;
 import br.edu.ifsp.guarulhos.forum_service.dto.response.TopicoResponse;
+import br.edu.ifsp.guarulhos.forum_service.exception.AcessoNegadoException;
+import br.edu.ifsp.guarulhos.forum_service.exception.RecursoNaoEncontradoException;
 import br.edu.ifsp.guarulhos.forum_service.model.Topico;
 import br.edu.ifsp.guarulhos.forum_service.model.enums.TipoLike;
 import br.edu.ifsp.guarulhos.forum_service.repository.ComentarioRepository;
@@ -52,7 +54,7 @@ public class TopicoService {
 
     public TopicoResponse buscarPorId(Long id){
         Topico topico = topicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tópico não encontrado"));
         return montarResponse(topico);
     }
 
@@ -62,7 +64,7 @@ public class TopicoService {
     public TopicoResponse encerrar(Long id, String perfil){
         validarModerador(perfil);
         Topico topico = topicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tópico não encontrado"));
         topico.setEncerrado(true);
         topicoRepository.save(topico);
         return montarResponse(topico);
@@ -74,7 +76,7 @@ public class TopicoService {
     public TopicoResponse fixar(Long id, String perfil){
         validarModerador(perfil);
         Topico topico = topicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tópico não encontrado"));
         topico.setFixado(!topico.isFixado());
         topicoRepository.save(topico);
         return montarResponse(topico);
@@ -86,13 +88,13 @@ public class TopicoService {
     public void deletar(Long id, String perfil){
         validarModerador(perfil);
         Topico topico = topicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tópico não encontrado"));
         topicoRepository.delete(topico);
     }
 
     private void validarModerador(String perfil){
         if(!"MODERADOR".equals(perfil)){
-            throw new RuntimeException("Apenas moderadores podem realizar esta ação");
+            throw new AcessoNegadoException("Apenas moderadores podem realizar esta ação");
         }
     }
 
