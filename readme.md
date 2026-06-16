@@ -6,17 +6,17 @@ Inspirada no Stack Overflow e no LeetCode, a plataforma oferece fórum colaborat
 
 ---
 
-## Equipe
+## 👥 Equipe
 
-| Nome | RA |
-|------|----|
-| Giullia Maria de Camargo | GU305554X |
-| Maria Eduarda Rodrigues | GU3054985 | 
-| Raissa Carla Ferreira | GU3054781 | 
+| Nome | RA | Responsabilidade |
+|------|----|-----------------|
+| Giullia Maria de Camargo | GU305554X | `auth-service` + `api-gateway` |
+| Maria Eduarda Rodrigues | GU3054985 | `forum-service` |
+| Raissa Carla Ferreira | GU3054781 | `algorithm-service` |
 
 ---
 
-## Arquitetura
+## 🏗️ Arquitetura
 
 ```
                         ┌─────────────────┐
@@ -37,29 +37,31 @@ Inspirada no Stack Overflow e no LeetCode, a plataforma oferece fórum colaborat
 
 Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre serviços passa pelo gateway, que valida o JWT e injeta `X-User-Id` e `X-User-Role` nos headers.
 
----
-
-## Microsserviços
-
-| Serviço | Porta | Banco | User Stories |
-|---------|-------|-------|--------------|
-| `api-gateway` | 8080 | — | Roteamento geral |
-| `auth-service` | 8081 | `ifsp_auth` | US-19 |
-| `forum-service` | 8082 | `ifsp_forum` | US-01 a US-06 |
-| `algorithm-service` | 8083 | `ifsp_algorithm` | US-07, 08, 09, 10 |
+> ⚠️ **Nota técnica:** O `api-gateway` está implementado com filtro JWT, porém o Spring Cloud Gateway ainda não possui versão estável compatível com Spring Boot 4.0.6. Durante o desenvolvimento, os serviços podem ser acessados diretamente nas suas portas.
 
 ---
 
-## Pré-requisitos
+## 📦 Status dos Microsserviços
+
+| Serviço | Porta | Banco | User Stories | Status |
+|---------|-------|-------|--------------|--------|
+| `api-gateway` | 8080 | — | Roteamento + JWT | ⚠️ Incompatibilidade Spring Cloud |
+| `auth-service` | 8081 | `ifsp_auth` | US-19 | ✅ Concluído |
+| `forum-service` | 8082 | `ifsp_forum` | US-01 a US-06 | ✅ Concluído |
+| `algorithm-service` | 8083 | `ifsp_algorithm` | US-07, 08, 09, 10 | 🔄 Em andamento |
+
+---
+
+## ⚙️ Pré-requisitos
 
 - Java 17+
 - Maven 3.8+
-- MySQL 8+
+- MySQL 8+ ou MariaDB 10.6+
 - IntelliJ IDEA (recomendado)
 
 ---
 
-## Como rodar localmente
+## 🚀 Como rodar localmente
 
 ### 1. Clone o repositório
 
@@ -68,7 +70,7 @@ git clone https://github.com/GiulliaM/ifsp-forum-platform.git
 cd ifsp-forum-platform
 ```
 
-### 2. Cria os bancos de dados
+### 2. Crie os bancos de dados
 
 ```sql
 CREATE DATABASE ifsp_auth;
@@ -78,8 +80,7 @@ CREATE DATABASE ifsp_algorithm;
 
 ### 3. Configure o `application.properties` de cada serviço
 
-Em cada serviço, o arquivo fica em `src/main/resources/application.properties`.
-Troque a senha se necessário:
+O arquivo fica em `src/main/resources/application.properties` de cada serviço. Troque a senha se necessário:
 
 ```properties
 spring.datasource.username=root
@@ -88,21 +89,20 @@ spring.datasource.password=SUA_SENHA_AQUI
 
 ### 4. Rode cada serviço
 
-Abre cada pasta no IntelliJ como projeto Maven separado e clica em **Run**, ou pelo terminal:
+Abra cada pasta no IntelliJ e clique em **Run**, ou pelo terminal:
 
 ```bash
-# Em terminais separados:
-cd auth-service && mvn spring-boot:run
-cd forum-service && mvn spring-boot:run
+# Em terminais separados — suba o auth-service primeiro
+cd auth-service      && mvn spring-boot:run
+cd forum-service     && mvn spring-boot:run
 cd algorithm-service && mvn spring-boot:run
-cd api-gateway && mvn spring-boot:run
 ```
 
-> ⚠️ Sobe o `auth-service` antes dos outros — o gateway depende do JWT que ele gera.
+> ⚠️ Suba o `auth-service` antes dos outros — ele é responsável pela geração do JWT.
 
 ---
 
-## Autenticação
+## 🔐 Autenticação
 
 O `auth-service` gera um **JWT** no login. Todos os endpoints protegidos precisam do token no header:
 
@@ -110,65 +110,148 @@ O `auth-service` gera um **JWT** no login. Todos os endpoints protegidos precisa
 Authorization: Bearer SEU_TOKEN_AQUI
 ```
 
-O gateway valida o token e injeta automaticamente nos outros serviços:
-- `X-User-Id` — ID do usuário logado
-- `X-User-Role` — papel: `ESTUDANTE`, `MODERADOR` ou `ADMINISTRADOR`
+O token contém:
+- `sub` — ID do usuário
+- `perfil` — papel: `ESTUDANTE`, `MODERADOR` ou `ADMINISTRADOR`
 
-Os outros serviços **não validam JWT** — só leem esses headers.
+Os outros serviços leem os headers `X-User-Id` e `X-User-Role` injetados pelo gateway e **não validam o JWT diretamente**.
 
 ---
 
-## Endpoints principais
+## 🔗 Endpoints
 
 ### Auth Service (`localhost:8081`)
-| Método | Rota | Descrição | Auth? |
-|--------|------|-----------|-------|
-| POST | `/api/auth/register` | Cadastro | ❌ |
-| POST | `/api/auth/login` | Login → JWT | ❌ |
-| DELETE | `/api/auth/usuarios/me` | Excluir conta (LGPD) | ✅ |
 
-### Forum Service (`localhost:8082`)
 | Método | Rota | Descrição | Auth? |
 |--------|------|-----------|-------|
-| POST | `/api/topicos` | Criar tópico | ✅ |
-| GET | `/api/topicos` | Listar tópicos | ❌ |
-| POST | `/api/topicos/{id}/comentarios` | Comentar | ✅ |
-| POST | `/api/topicos/{id}/like` | Like/unlike | ✅ |
-| POST | `/api/topicos/{id}/seguir` | Seguir tópico | ✅ |
-| PATCH | `/api/topicos/{id}/encerrar` | Encerrar (moderador) | ✅ |
+| POST | `/api/auth/registrar` | Cadastro de novo usuário (sempre ESTUDANTE) | ❌ |
+| POST | `/api/auth/login` | Login → retorna JWT | ❌ |
+| DELETE | `/api/auth/usuarios/deletar` | Excluir conta (LGPD) | ✅ |
 
-### Algorithm Service (`localhost:8083`)
-| Método | Rota | Descrição | Auth? |
-|--------|------|-----------|-------|
-| GET | `/api/exercicios` | Listar exercícios | ❌ |
-| GET | `/api/exercicios/{id}` | Detalhe do exercício | ❌ |
-| POST | `/api/submissoes` | Submeter solução | ✅ |
-| GET | `/api/submissoes/{id}/feedback` | Feedback detalhado | ✅ |
+**Exemplo de cadastro:**
+```json
+POST /api/auth/registrar
+{
+  "nome": "João Silva",
+  "email": "joao@ifsp.edu.br",
+  "senha": "123456",
+  "termosAceitos": true
+}
+```
+
+**Resposta:**
+```json
+{
+  "token": "eyJhbGciOiJIUzM4NCJ9...",
+  "nome": "João Silva",
+  "email": "joao@ifsp.edu.br",
+  "perfil": "ESTUDANTE"
+}
+```
 
 ---
 
-## Estrutura de pacotes
+### Forum Service (`localhost:8082`)
+
+| Método | Rota | Descrição | Auth? | Role |
+|--------|------|-----------|-------|------|
+| POST | `/api/topicos` | Criar tópico | ✅ | ESTUDANTE+ |
+| GET | `/api/topicos` | Listar todos os tópicos | ❌ | — |
+| GET | `/api/topicos/{id}` | Buscar tópico por ID | ❌ | — |
+| DELETE | `/api/topicos/{id}` | Remover tópico | ✅ | MODERADOR |
+| PATCH | `/api/topicos/{id}/encerrar` | Encerrar tópico | ✅ | MODERADOR |
+| PATCH | `/api/topicos/{id}/fixar` | Fixar/desafixar tópico | ✅ | MODERADOR |
+| POST | `/api/topicos/{id}/comentarios` | Comentar em tópico | ✅ | ESTUDANTE+ |
+| PUT | `/api/comentarios/{id}` | Editar comentário (≤30 min) | ✅ | Dono |
+| DELETE | `/api/comentarios/{id}` | Excluir comentário (≤30 min) | ✅ | Dono |
+| POST | `/api/topicos/{id}/like` | Like/unlike em tópico | ✅ | ESTUDANTE+ |
+| POST | `/api/comentarios/{id}/like` | Like/unlike em comentário | ✅ | ESTUDANTE+ |
+| POST | `/api/topicos/{id}/seguir` | Seguir tópico | ✅ | ESTUDANTE+ |
+| DELETE | `/api/topicos/{id}/seguir` | Desseguir tópico | ✅ | ESTUDANTE+ |
+| GET | `/api/topicos/seguidos` | Listar tópicos seguidos | ✅ | ESTUDANTE+ |
+
+**Exemplo de criação de tópico:**
+```json
+POST /api/topicos
+Headers: X-User-Id: 1, X-User-Role: ESTUDANTE
+{
+  "titulo": "Como funciona uma árvore binária?",
+  "descricao": "Estou com dificuldade em entender a estrutura de uma árvore binária e como percorrê-la.",
+  "categoria": "Estruturas de Dados"
+}
+```
+
+---
+
+### Algorithm Service (`localhost:8083`)
+
+| Método | Rota | Descrição | Auth? | Role |
+|--------|------|-----------|-------|------|
+| GET | `/api/exercicios` | Listar exercícios | ❌ | — |
+| GET | `/api/exercicios/{id}` | Detalhe do exercício | ❌ | — |
+| POST | `/api/exercicios` | Cadastrar exercício | ✅ | MODERADOR |
+| POST | `/api/submissoes` | Submeter solução | ✅ | ESTUDANTE+ |
+| GET | `/api/submissoes/me` | Histórico de submissões | ✅ | ESTUDANTE+ |
+| GET | `/api/submissoes/{id}/feedback` | Feedback detalhado | ✅ | Dono |
+
+---
+
+## 🗂️ Estrutura de pacotes
 
 Todos os serviços seguem o mesmo padrão:
 
 ```
 src/main/java/br/edu/ifsp/guarulhos/[servico]/
-├── controller/       ← endpoints REST
-├── service/          ← regras de negócio
-├── repository/       ← interfaces JPA
-├── model/            ← entidades do banco
+├── controller/        ← endpoints REST
+├── service/           ← regras de negócio
+├── repository/        ← interfaces JPA
+├── model/             ← entidades do banco
 │   └── enums/
 ├── dto/
-│   ├── request/      ← dados que chegam na API
-│   └── response/     ← dados que saem da API
+│   ├── request/       ← dados que chegam na API
+│   └── response/      ← dados que saem da API
+├── exception/         ← exceções customizadas
 └── NomeApplication.java
 ```
 
 ---
 
-## 📌 Sprints
+## 🗃️ Banco de dados
 
-| Sprint | Período | Meta |
-|--------|---------|------|
-| Sprint 1 | até 09/06/2026 | Fórum, Seguimento, Algoritmos (core) e Segurança |
-| Sprint 2 | 10/06 – 16/06/2026 | Gamificação, Personalização, Suporte e RNFs |
+As tabelas são criadas automaticamente pelo JPA (`ddl-auto=update`). Para visualizar após subir os serviços:
+
+```sql
+USE ifsp_auth;
+SHOW TABLES;
+DESCRIBE usuarios;
+
+USE ifsp_forum;
+SHOW TABLES;
+
+USE ifsp_algorithm;
+SHOW TABLES;
+```
+
+**Tabelas por banco:**
+
+| Banco | Tabelas |
+|-------|---------|
+| `ifsp_auth` | `usuarios` |
+| `ifsp_forum` | `topicos`, `comentarios`, `likes`, `seguimentos` |
+| `ifsp_algorithm` | `exercicios`, `casos_teste`, `submissoes`, `resultados_caso_teste` |
+
+---
+
+## 📋 Sprints
+
+| Sprint | Período | Meta | Status |
+|--------|---------|------|--------|
+| Sprint 1 | até 09/06/2026 | Fórum completo, Seguimento, Catálogo e Submissão de Algoritmos, Segurança | ✅ |
+| Sprint 2 | 10/06 – 16/06/2026 | Gamificação, Personalização, Suporte, Painel Pedagógico e RNFs | 🔄 |
+
+---
+
+## 📄 Documentação
+
+- [Histórias de Usuário (PDF)](./Historias_de_Usuario_IFSP.pdf)
+- [Enunciado do Tema 5 (PDF)](./TEMA_5.pdf)
