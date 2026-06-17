@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/usuarios")
+@RequestMapping("/api/topicos")
 @RequiredArgsConstructor
 public class UsuarioController {
 
     private final SeguimentoService seguimentoService;
 
     // US-06 - listar os tópicos que o usuário logado segue
-    @GetMapping("/me/topicos-seguidos")
+    @GetMapping("/seguidos")
     public ResponseEntity<List<TopicoResponse>> topicosSeguidos(@RequestHeader("X-User-Id") Long usuarioId){
         return ResponseEntity.ok(seguimentoService.topicosSeguidos(usuarioId));
     }

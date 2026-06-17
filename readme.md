@@ -246,8 +246,8 @@ SHOW TABLES;
 
 | Sprint | Período | Meta | Status |
 |--------|---------|------|--------|
-| Sprint 1 | até 09/06/2026 | Fórum completo, Seguimento, Catálogo e Submissão de Algoritmos, Segurança | ✅ |
-| Sprint 2 | 10/06 – 16/06/2026 | Gamificação, Personalização, Suporte, Painel Pedagógico e RNFs | 🔄 |
+| Sprint 1 | até 16/06/2026 | Fórum completo, Seguimento, Catálogo e Submissão de Algoritmos, Segurança | ✅ |
+| Sprint 2 | 17/06 – 30/06/2026 | Gamificação, Personalização, Suporte, Painel Pedagógico e RNFs | 🔄 |
 
 ---
 

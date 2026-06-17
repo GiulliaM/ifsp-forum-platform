@@ -40,7 +40,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered{
                     .getHeaders()
                     .getFirst(HttpHeaders.AUTHORIZATION);
 
-            if (authHeader == null || !authHeader.startsWith("Bear ")){
+            if (authHeader == null || !authHeader.startsWith("Bearer ")){
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete(); // se rot nn for publica e nn tiver token, retornar 401
             }
