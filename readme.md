@@ -37,7 +37,7 @@ Inspirada no Stack Overflow e no LeetCode, a plataforma oferece fórum colaborat
 
 Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre serviços passa pelo gateway, que valida o JWT e injeta `X-User-Id` e `X-User-Role` nos headers.
 
-> ⚠️ **Nota técnica:** O `api-gateway` está implementado com filtro JWT, porém o Spring Cloud Gateway ainda não possui versão estável compatível com Spring Boot 4.0.6. Durante o desenvolvimento, os serviços podem ser acessados diretamente nas suas portas.
+> ℹ️ **Nota técnica:** Como o Spring Cloud Gateway ainda não possui versão estável compatível com Spring Boot 4.0.6, o `api-gateway` roda em **Spring Boot 3.2.5 + Spring Cloud 2023.0.5** (combinação estável). Ele sobe na porta 8080, valida o JWT e roteia para os serviços. Os demais serviços continuam em Spring Boot 4.0.6.
 
 ---
 
@@ -45,7 +45,7 @@ Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre s
 
 | Serviço | Porta | Banco | User Stories | Status |
 |---------|-------|-------|--------------|--------|
-| `api-gateway` | 8080 | — | Roteamento + JWT | ⚠️ Incompatibilidade Spring Cloud |
+| `api-gateway` | 8080 | — | Roteamento + JWT | ✅ Funcional (Spring Boot 3.2.5) |
 | `auth-service` | 8081 | `ifsp_auth` | US-19 | ✅ Concluído |
 | `forum-service` | 8082 | `ifsp_forum` | US-01 a US-06 | ✅ Concluído |
 | `algorithm-service` | 8083 | `ifsp_algorithm` | US-07, 08, 09, 10 | 🔄 Em andamento |
