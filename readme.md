@@ -48,7 +48,7 @@ Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre s
 | `api-gateway` | 8080 | — | Roteamento + JWT | ✅ Funcional (Spring Boot 3.2.5) |
 | `auth-service` | 8081 | `ifsp_auth` | US-19 | ✅ Concluído |
 | `forum-service` | 8082 | `ifsp_forum` | US-01 a US-06 | ✅ Concluído |
-| `algorithm-service` | 8083 | `ifsp_algorithm` | US-07, 08, 09, 10 | 🔄 Em andamento |
+| `algorithm-service` | 8083 | `ifsp_algorithm` | US-07, 08, 09, 10 | ✅ Concluído |
 
 ---
 
@@ -194,6 +194,39 @@ Headers: X-User-Id: 1, X-User-Role: ESTUDANTE
 | GET | `/api/submissoes/me` | Histórico de submissões | ✅ | ESTUDANTE+ |
 | GET | `/api/submissoes/{id}/feedback` | Feedback detalhado | ✅ | Dono |
 
+> ℹ️ **Juiz por comparação:** o `algorithm-service` não executa código em sandbox. A submissão envia o código e a **lista de saídas** produzidas pela solução (uma por caso de teste, na ordem). O serviço normaliza e compara com a saída esperada de cada caso, gravando o resultado individual (base do feedback da US-09). Veredito: `ACEITO` quando todos os casos passam, senão `RESPOSTA_ERRADA`.
+
+**Exemplo de cadastro de exercício (US-10, MODERADOR):**
+```json
+POST /api/exercicios
+Headers: X-User-Id: 9, X-User-Role: MODERADOR
+{
+  "titulo": "Soma de dois números",
+  "enunciado": "Leia dois inteiros e imprima a soma deles.",
+  "dificuldade": "FACIL",
+  "categoria": "Matemática",
+  "exemploEntrada": "2 3",
+  "exemploSaida": "5",
+  "publicar": true,
+  "casosTeste": [
+    { "entrada": "2 3", "saidaEsperada": "5" },
+    { "entrada": "10 7", "saidaEsperada": "17" }
+  ]
+}
+```
+
+**Exemplo de submissão (US-08, ESTUDANTE):**
+```json
+POST /api/submissoes
+Headers: X-User-Id: 1, X-User-Role: ESTUDANTE
+{
+  "exercicioId": 1,
+  "linguagem": "JAVA",
+  "codigo": "public class Main { ... }",
+  "saidas": ["5", "17"]
+}
+```
+
 ---
 
 ## 🗂️ Estrutura de pacotes
@@ -246,7 +279,7 @@ SHOW TABLES;
 
 | Sprint | Período | Meta | Status |
 |--------|---------|------|--------|
-| Sprint 1 | até 16/06/2026 | Fórum completo, Seguimento, Catálogo e Submissão de Algoritmos, Segurança | ✅ |
+| Sprint 1 | até 16/06/2026 | Fórum completo, Seguimento, Catálogo e Submissão de Algoritmos, Segurança | ✅ Concluída |
 | Sprint 2 | 17/06 – 30/06/2026 | Gamificação, Personalização, Suporte, Painel Pedagógico e RNFs | 🔄 |
 
 ---
