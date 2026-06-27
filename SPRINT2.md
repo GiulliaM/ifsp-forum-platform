@@ -40,11 +40,17 @@ Responsabilidades por integrante (mesma base da Sprint 1):
 | **US-16** | Abrir chamado de suporte (protocolo, FAQ, status) | suporte |
 | **US-17** | Atender chamados (painel moderador, urgente 48h) | suporte |
 
-### ⚪ Transversal / a combinar
+### ⚪ Fora de escopo (projeto é só de APIs/microsserviços)
 
-| US | Observação |
-|----|-----------|
-| **US-18** | Responsividade (320–2560px, Lighthouse) → frontend. Se a entrega é só de APIs, documentar como fora de escopo. |
+O projeto **não terá frontend**. As CAs de interface ficam fora de escopo e devem ser
+documentadas como tal na entrega; o que tem contrapartida de backend é mantido.
+
+| US | Decisão no escopo só-API |
+|----|--------------------------|
+| **US-18** | Responsividade (320–2560px, Lighthouse, WCAG) → **fora de escopo** (puramente frontend). |
+| **US-15** | Upload/incorporação de imagens e Markdown → backend só **armazena/serve** o conteúdo; preview em tempo real e syntax highlighting são de UI (fora de escopo). |
+| **US-13/US-14** | Onboarding e seção "Recomendado para Você" são telas; backend entrega os **endpoints** de preferências e de recomendações. |
+| **US-11/US-12** | Exibição de ranking/badges é UI; backend entrega os **endpoints** já especificados. |
 
 ---
 
