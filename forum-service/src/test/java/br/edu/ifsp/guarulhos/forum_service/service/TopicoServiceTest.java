@@ -4,6 +4,7 @@ import br.edu.ifsp.guarulhos.forum_service.dto.request.TopicoRequest;
 import br.edu.ifsp.guarulhos.forum_service.dto.response.TopicoResponse;
 import br.edu.ifsp.guarulhos.forum_service.exception.AcessoNegadoException;
 import br.edu.ifsp.guarulhos.forum_service.exception.RecursoNaoEncontradoException;
+import br.edu.ifsp.guarulhos.forum_service.exception.RegraNegocioException;
 import br.edu.ifsp.guarulhos.forum_service.model.Topico;
 import br.edu.ifsp.guarulhos.forum_service.repository.ComentarioRepository;
 import br.edu.ifsp.guarulhos.forum_service.repository.LikeRepository;
@@ -52,6 +53,19 @@ class TopicoServiceTest {
         assertThat(response.getAutorId()).isEqualTo(7L);
         assertThat(response.isEncerrado()).isFalse();
         verify(topicoRepository).save(any(Topico.class));
+    }
+
+    @Test
+    void criar_comTituloDuplicado_lancaRegraNegocio() {
+        TopicoRequest request = new TopicoRequest();
+        request.setTitulo("Como usar injeção de dependência no Spring");
+        request.setDescricao("Estou com dúvida sobre @Autowired e construtor no Spring Boot");
+        request.setCategoria("Java");
+        when(topicoRepository.existsByTituloIgnoreCase(request.getTitulo())).thenReturn(true);
+
+        assertThatThrownBy(() -> topicoService.criar(request, 7L))
+                .isInstanceOf(RegraNegocioException.class);
+        verify(topicoRepository, never()).save(any(Topico.class));
     }
 
     @Test
