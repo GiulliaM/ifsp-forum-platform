@@ -168,7 +168,7 @@ POST /api/auth/registrar
 | POST | `/api/comentarios/{id}/like` | Like/unlike em comentário | ✅ | ESTUDANTE+ |
 | POST | `/api/topicos/{id}/seguir` | Seguir tópico | ✅ | ESTUDANTE+ |
 | DELETE | `/api/topicos/{id}/seguir` | Desseguir tópico | ✅ | ESTUDANTE+ |
-| GET | `/api/topicos/seguidos` | Listar tópicos seguidos | ✅ | ESTUDANTE+ |
+| GET | `/api/topicos/seguidos?categoria=&ordem=desc` | Listar tópicos seguidos (filtro por categoria, ordenação por data, destaque de novidades) | ✅ | ESTUDANTE+ |
 
 **Exemplo de criação de tópico:**
 ```json
