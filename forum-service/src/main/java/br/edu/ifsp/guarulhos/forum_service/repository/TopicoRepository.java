@@ -10,4 +10,6 @@ public interface TopicoRepository extends JpaRepository<Topico, Long> {
     List<Topico> findByCategoria(String categoria);
 
     List<Topico> findByFixadoTrue();
+
+    boolean existsByTituloIgnoreCase(String titulo);
 }

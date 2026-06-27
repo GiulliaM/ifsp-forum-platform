@@ -4,6 +4,7 @@ import br.edu.ifsp.guarulhos.forum_service.dto.request.TopicoRequest;
 import br.edu.ifsp.guarulhos.forum_service.dto.response.TopicoResponse;
 import br.edu.ifsp.guarulhos.forum_service.exception.AcessoNegadoException;
 import br.edu.ifsp.guarulhos.forum_service.exception.RecursoNaoEncontradoException;
+import br.edu.ifsp.guarulhos.forum_service.exception.RegraNegocioException;
 import br.edu.ifsp.guarulhos.forum_service.model.Topico;
 import br.edu.ifsp.guarulhos.forum_service.model.enums.TipoLike;
 import br.edu.ifsp.guarulhos.forum_service.repository.ComentarioRepository;
@@ -28,6 +29,10 @@ public class TopicoService {
     * que o gateway injeta depois de validar o JWT.
     * */
     public TopicoResponse criar(TopicoRequest request, Long autorId){
+        if(topicoRepository.existsByTituloIgnoreCase(request.getTitulo())){
+            throw new RegraNegocioException("Já existe um tópico com este título");
+        }
+
         Topico topico = Topico.builder()
                 .titulo(request.getTitulo())
                 .descricao(request.getDescricao())
