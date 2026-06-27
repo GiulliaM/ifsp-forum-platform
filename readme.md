@@ -10,9 +10,9 @@ Inspirada no Stack Overflow e no LeetCode, a plataforma oferece fórum colaborat
 
 | Nome | RA | Responsabilidade |
 |------|----|-----------------|
-| Giullia Maria de Camargo | GU305554X | `auth-service` + `api-gateway` |
+| Giullia Maria de Camargo | GU305554X | `auth-service` + `api-gateway` + `algorithm-service` |
 | Maria Eduarda Rodrigues | GU3054985 | `forum-service` |
-| Raissa Carla Ferreira | GU3054781 | `algorithm-service` |
+| Raissa Carla Ferreira | GU3054781 | Suporte Técnico (Sprint 2 — US-16 e US-17) |
 
 ---
 
