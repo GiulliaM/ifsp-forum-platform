@@ -21,4 +21,5 @@ public class TopicoResponse {
     private long totalLikes;
     private long totalComentarios;
     private LocalDateTime criadoEm;
+    private boolean temNovidades;
 }

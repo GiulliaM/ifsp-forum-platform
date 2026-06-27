@@ -5,11 +5,13 @@ import br.edu.ifsp.guarulhos.forum_service.exception.RecursoNaoEncontradoExcepti
 import br.edu.ifsp.guarulhos.forum_service.exception.RegraNegocioException;
 import br.edu.ifsp.guarulhos.forum_service.model.Seguimento;
 import br.edu.ifsp.guarulhos.forum_service.model.Topico;
+import br.edu.ifsp.guarulhos.forum_service.repository.ComentarioRepository;
 import br.edu.ifsp.guarulhos.forum_service.repository.SeguimentoRepository;
 import br.edu.ifsp.guarulhos.forum_service.repository.TopicoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -18,6 +20,7 @@ public class SeguimentoService {
 
     private final SeguimentoRepository seguimentoRepository;
     private final TopicoRepository topicoRepository;
+    private final ComentarioRepository comentarioRepository;
     private final TopicoService topicoService;
 
     /*
@@ -48,12 +51,30 @@ public class SeguimentoService {
     }
 
     /*
-    * US-06 - listar os tópicos que o usuário segue.
+    * US-06 - listar os tópicos que o usuário segue, com filtro opcional por categoria
+    * e ordenação por data de criação (asc/desc). Marca temNovidades quando há comentários
+    * publicados depois que o usuário começou a seguir o tópico.
     * */
-    public List<TopicoResponse> topicosSeguidos(Long usuarioId){
+    public List<TopicoResponse> topicosSeguidos(Long usuarioId, String categoria, String ordem){
+        Comparator<TopicoResponse> porData = Comparator.comparing(
+                TopicoResponse::getCriadoEm, Comparator.nullsLast(Comparator.naturalOrder()));
+        if(!"asc".equalsIgnoreCase(ordem)){
+            porData = porData.reversed();
+        }
+
         return seguimentoRepository.findByUsuarioId(usuarioId).stream()
-                .map(Seguimento::getTopico)
-                .map(topicoService::montarResponse)
+                .filter(seguimento -> categoria == null || categoria.isBlank()
+                        || categoria.equalsIgnoreCase(seguimento.getTopico().getCategoria()))
+                .map(seguimento -> {
+                    Topico topico = seguimento.getTopico();
+                    TopicoResponse response = topicoService.montarResponse(topico);
+                    boolean novidades = seguimento.getSeguidoEm() != null
+                            && comentarioRepository.existsByTopicoIdAndCriadoEmAfter(
+                                    topico.getId(), seguimento.getSeguidoEm());
+                    response.setTemNovidades(novidades);
+                    return response;
+                })
+                .sorted(porData)
                 .toList();
     }
 }

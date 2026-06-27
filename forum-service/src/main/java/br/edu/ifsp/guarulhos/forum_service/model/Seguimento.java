@@ -3,6 +3,8 @@ package br.edu.ifsp.guarulhos.forum_service.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "seguimentos",
@@ -21,4 +23,12 @@ public class Seguimento {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topico_id", nullable = false)
     private Topico topico;
+
+    @Column(name = "seguido_em", updatable = false)
+    private LocalDateTime seguidoEm;
+
+    @PrePersist
+    protected void onCreate() {
+        this.seguidoEm = LocalDateTime.now();
+    }
 }

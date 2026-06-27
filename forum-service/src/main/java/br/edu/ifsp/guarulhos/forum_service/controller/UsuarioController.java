@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -18,9 +19,12 @@ public class UsuarioController {
 
     private final SeguimentoService seguimentoService;
 
-    // US-06 - listar os tópicos que o usuário logado segue
+    // US-06 - listar os tópicos que o usuário logado segue, com filtro por categoria e ordenação por data
     @GetMapping("/seguidos")
-    public ResponseEntity<List<TopicoResponse>> topicosSeguidos(@RequestHeader("X-User-Id") Long usuarioId){
-        return ResponseEntity.ok(seguimentoService.topicosSeguidos(usuarioId));
+    public ResponseEntity<List<TopicoResponse>> topicosSeguidos(
+            @RequestHeader("X-User-Id") Long usuarioId,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false, defaultValue = "desc") String ordem){
+        return ResponseEntity.ok(seguimentoService.topicosSeguidos(usuarioId, categoria, ordem));
     }
 }
