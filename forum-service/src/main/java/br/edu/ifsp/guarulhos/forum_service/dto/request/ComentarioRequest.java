@@ -10,4 +10,6 @@ public class ComentarioRequest {
     private String conteudo;
 
     private Long parentId;
+
+    private String imageUrl;
 }

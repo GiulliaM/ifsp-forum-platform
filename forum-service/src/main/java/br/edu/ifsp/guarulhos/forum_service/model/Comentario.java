@@ -34,6 +34,9 @@ public class Comentario {
     @Column(name = "editado_em")
     private LocalDateTime editadoEm;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @PrePersist
     protected void onCreate() {
         this.criadoEm = LocalDateTime.now();

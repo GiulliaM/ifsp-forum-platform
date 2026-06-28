@@ -17,4 +17,6 @@ public class TopicoRequest {
 
     @NotBlank(message = "Categoria é obrigatória")
     private String categoria;
+
+    private String imageUrl;
 }

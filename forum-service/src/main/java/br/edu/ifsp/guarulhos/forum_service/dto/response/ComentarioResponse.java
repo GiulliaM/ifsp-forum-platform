@@ -19,4 +19,5 @@ public class ComentarioResponse {
     private long totalLikes;
     private LocalDateTime criadoEm;
     private LocalDateTime editadoEm;
+    private String imageUrl;
 }
