@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 /**
  * Regras de pontuação (US-12): valora os eventos recebidos dos demais serviços, garante
@@ -105,17 +106,27 @@ public class PontuacaoService {
         };
     }
 
-    /**
-     * Avalia e desbloqueia conquistas que o usuário tenha atingido após o novo evento.
-     * TODO: implementar as regras concretas (ex.: PRIMEIRO_TOPICO, 10_EXERCICIOS) consultando
-     * os totais do usuário e gravando em UsuarioConquista quando o critério for satisfeito.
-     */
     private void avaliarConquistas(Long usuarioId){
-        // Esqueleto: regras de desbloqueio a definir junto com o catálogo de badges.
+        verificarBadge(usuarioId, "PRIMEIRO_TOPICO",
+                () -> pontosEventoRepository.countByUsuarioIdAndTipo(usuarioId, TipoEvento.TOPICO_CRIADO) >= 1);
+        verificarBadge(usuarioId, "PRIMEIRO_COMENTARIO",
+                () -> pontosEventoRepository.countByUsuarioIdAndTipo(usuarioId, TipoEvento.COMENTARIO) >= 1);
+        verificarBadge(usuarioId, "PRIMEIRO_LIKE",
+                () -> pontosEventoRepository.countByUsuarioIdAndTipo(usuarioId, TipoEvento.LIKE_RECEBIDO) >= 1);
+        verificarBadge(usuarioId, "PRIMEIRO_EXERCICIO",
+                () -> pontosEventoRepository.countByUsuarioIdAndTipo(usuarioId, TipoEvento.EXERCICIO_RESOLVIDO) >= 1);
+        verificarBadge(usuarioId, "10_EXERCICIOS",
+                () -> pontosEventoRepository.countByUsuarioIdAndTipo(usuarioId, TipoEvento.EXERCICIO_RESOLVIDO) >= 10);
     }
 
-    /** Marca uma conquista como desbloqueada para o usuário, evitando duplicidade. */
-    @SuppressWarnings("unused")
+    private void verificarBadge(Long usuarioId, String criterio, BooleanSupplier condicao){
+        conquistaRepository.findByCriterio(criterio).ifPresent(conquista -> {
+            if (condicao.getAsBoolean()){
+                desbloquear(usuarioId, conquista);
+            }
+        });
+    }
+
     private void desbloquear(Long usuarioId, Conquista conquista){
         if (usuarioConquistaRepository.existsByUsuarioIdAndConquistaId(usuarioId, conquista.getId())){
             return;

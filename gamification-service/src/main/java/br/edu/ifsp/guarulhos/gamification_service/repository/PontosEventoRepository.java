@@ -23,6 +23,9 @@ public interface PontosEventoRepository extends JpaRepository<PontosEvento, Long
     /** Extrato de pontos do usuário, mais recentes primeiro (US-12, CA2). */
     List<PontosEvento> findByUsuarioIdOrderByCriadoEmDesc(Long usuarioId);
 
+    /** Quantidade de eventos de um tipo específico para o usuário; usado pela avaliação de badges. */
+    long countByUsuarioIdAndTipo(Long usuarioId, TipoEvento tipo);
+
     /**
      * Ranking agregado: soma os pontos por usuário dentro do escopo (tipos de evento) e do
      * período (a partir de {@code desde}), ordenando do maior para o menor (US-11).
