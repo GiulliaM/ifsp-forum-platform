@@ -15,30 +15,30 @@ Responsabilidades por integrante (mesma base da Sprint 1):
 
 ### 🟣 Giullia — `auth` + `gateway` + `algorithm`
 
-| US | O que é | Serviço |
-|----|---------|---------|
-| **US-10** | Cadastrar exercício *(já concluído)* | algorithm |
-| **US-19** | Conclusão de segurança: refresh token + expiração configurável | auth |
-| **US-14** | Preferências de aprendizado (interesses, nível, linguagens) — dado de perfil | auth |
-| **US-11** | Ranking de usuários | gamificação |
-| **US-12** | Acumular pontos por contribuição | gamificação |
-| **US-13** | Sugestões personalizadas (tópicos + exercícios) | personalização |
-| **US-20** | Painel pedagógico — lado algoritmos (exercícios com maior taxa de erro) | algorithm |
+| US | O que é | Serviço | Status |
+|----|---------|---------|--------|
+| **US-10** | Cadastrar exercício | algorithm | ✅ Concluído (Sprint 1) |
+| **US-11** | Ranking de usuários | gamificação | ✅ Concluído |
+| **US-12** | Acumular pontos por contribuição + badges | gamificação | ✅ Concluído |
+| **US-19** | Conclusão de segurança: refresh token + expiração configurável | auth | 🔄 Pendente |
+| **US-14** | Preferências de aprendizado (interesses, nível, linguagens) — dado de perfil | auth | 🔄 Pendente |
+| **US-13** | Sugestões personalizadas (tópicos + exercícios) | personalização | 🔄 Pendente |
+| **US-20** | Painel pedagógico — lado algoritmos (exercícios com maior taxa de erro) | algorithm | 🔄 Pendente |
 
 ### 🟢 Maria Eduarda — `forum`
 
-| US | O que é | Serviço |
-|----|---------|---------|
-| **US-15** | Inserir imagens e código formatado em publicações | forum |
-| **US-20** | Painel pedagógico — lado fórum (categorias com mais tópicos sem resposta aceita) | forum |
-| *(hooks)* | Emitir eventos de pontuação: tópico criado, comentário, like → US-12 | forum |
+| US | O que é | Serviço | Status |
+|----|---------|---------|--------|
+| **US-15** | Inserir imagens e código formatado em publicações | forum | 🔄 Pendente |
+| **US-20** | Painel pedagógico — lado fórum (categorias com mais tópicos sem resposta aceita) | forum | 🔄 Pendente |
+| *(hooks)* | Emitir eventos de pontuação: tópico criado, comentário, like → US-12 | forum | 🔄 Pendente |
 
 ### 🔵 Raissa — Suporte
 
-| US | O que é | Serviço |
-|----|---------|---------|
-| **US-16** | Abrir chamado de suporte (protocolo, FAQ, status) | suporte |
-| **US-17** | Atender chamados (painel moderador, urgente 48h) | suporte |
+| US | O que é | Serviço | Status |
+|----|---------|---------|--------|
+| **US-16** | Abrir chamado de suporte (protocolo, FAQ, status) | suporte | 🔄 Pendente |
+| **US-17** | Atender chamados (painel moderador, urgente 48h) | suporte | 🔄 Pendente |
 
 ### ⚪ Fora de escopo (projeto é só de APIs/microsserviços)
 

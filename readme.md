@@ -25,14 +25,14 @@ Inspirada no Stack Overflow e no LeetCode, a plataforma oferece fórum colaborat
                         │  validação JWT) │
                         └────────┬────────┘
                                  │
-          ┌──────────────────────┼──────────────────────┐
-          │                      │                      │
-   ┌──────▼──────┐       ┌───────▼──────┐      ┌───────▼──────┐
-   │auth-service │       │forum-service │      │algorithm-    │
-   │   :8081     │       │   :8082      │      │service :8083 │
-   │             │       │              │      │              │
-   │ ifsp_auth   │       │ ifsp_forum   │      │ifsp_algorithm│
-   └─────────────┘       └──────────────┘      └──────────────┘
+          ┌──────────────────────┼──────────────────────┬──────────────────────┐
+          │                      │                      │                      │
+   ┌──────▼──────┐       ┌───────▼──────┐      ┌───────▼──────┐      ┌────────▼───────┐
+   │auth-service │       │forum-service │      │algorithm-    │      │gamification-   │
+   │   :8081     │       │   :8082      │      │service :8083 │      │service  :8084  │
+   │             │       │              │      │              │      │                │
+   │ ifsp_auth   │       │ ifsp_forum   │      │ifsp_algorithm│      │ifsp_gamificati │
+   └─────────────┘       └──────────────┘      └──────────────┘      └────────────────┘
 ```
 
 Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre serviços passa pelo gateway, que valida o JWT e injeta `X-User-Id` e `X-User-Role` nos headers.
@@ -49,6 +49,7 @@ Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre s
 | `auth-service` | 8081 | `ifsp_auth` | US-19 | ✅ Concluído |
 | `forum-service` | 8082 | `ifsp_forum` | US-01 a US-06 | ✅ Concluído |
 | `algorithm-service` | 8083 | `ifsp_algorithm` | US-07, 08, 09, 10 | ✅ Concluído |
+| `gamification-service` | 8084 | `ifsp_gamification` | US-11, US-12 | ✅ Concluído |
 
 ---
 
@@ -76,6 +77,7 @@ cd ifsp-forum-platform
 CREATE DATABASE ifsp_auth;
 CREATE DATABASE ifsp_forum;
 CREATE DATABASE ifsp_algorithm;
+CREATE DATABASE ifsp_gamification;
 ```
 
 ### 3. Configure o `application.properties` de cada serviço
@@ -93,9 +95,10 @@ Abra cada pasta no IntelliJ e clique em **Run**, ou pelo terminal:
 
 ```bash
 # Em terminais separados — suba o auth-service primeiro
-cd auth-service      && mvn spring-boot:run
-cd forum-service     && mvn spring-boot:run
-cd algorithm-service && mvn spring-boot:run
+cd auth-service           && mvn spring-boot:run
+cd forum-service          && mvn spring-boot:run
+cd algorithm-service      && mvn spring-boot:run
+cd gamification-service   && mvn spring-boot:run
 ```
 
 > ⚠️ Suba o `auth-service` antes dos outros — ele é responsável pela geração do JWT.
@@ -229,6 +232,47 @@ Headers: X-User-Id: 1, X-User-Role: ESTUDANTE
 
 ---
 
+### Gamification Service (`localhost:8084`)
+
+| Método | Rota | Descrição | Auth? |
+|--------|------|-----------|-------|
+| POST | `/api/pontos/eventos` | Registrar evento pontuável (chamado por forum/algorithm) | ✅ interno |
+| GET | `/api/pontos/me` | Extrato de pontos do usuário logado (US-12) | ✅ |
+| GET | `/api/pontos/me/conquistas` | Badges desbloqueadas no perfil (US-12) | ✅ |
+| GET | `/api/ranking?escopo=GERAL&periodo=TOTAL` | Ranking de usuários (US-11) | ❌ |
+
+**Escopos do ranking:** `GERAL`, `FORUM`, `ALGORITMOS`  
+**Períodos:** `SEMANA`, `MES`, `TOTAL`
+
+**Exemplo de evento de pontuação:**
+```json
+POST /api/pontos/eventos
+Headers: X-User-Id: 1, X-User-Role: ESTUDANTE
+{
+  "tipo": "EXERCICIO_RESOLVIDO",
+  "usuarioId": 1,
+  "referenciaId": 42,
+  "dificuldade": "MEDIO"
+}
+```
+
+**Tabela de pontos:**
+
+| Ação | Pontos |
+|------|--------|
+| Criar tópico | +5 |
+| Comentar | +3 |
+| Receber like | +2 |
+| Resolver exercício fácil | +10 |
+| Resolver exercício médio | +20 |
+| Resolver exercício difícil | +40 |
+
+**Badges disponíveis:** `PRIMEIRO_TOPICO`, `PRIMEIRO_COMENTARIO`, `PRIMEIRO_LIKE`, `PRIMEIRO_EXERCICIO`, `10_EXERCICIOS`
+
+> ℹ️ Idempotência garantida: o mesmo evento `(tipo + referenciaId + usuarioId)` nunca pontua duas vezes.
+
+---
+
 ## 🗂️ Estrutura de pacotes
 
 Todos os serviços seguem o mesmo padrão:
@@ -272,6 +316,7 @@ SHOW TABLES;
 | `ifsp_auth` | `usuarios` |
 | `ifsp_forum` | `topicos`, `comentarios`, `likes`, `seguimentos` |
 | `ifsp_algorithm` | `exercicios`, `casos_teste`, `submissoes`, `resultados_caso_teste` |
+| `ifsp_gamification` | `pontos_evento`, `conquista`, `usuario_conquista` |
 
 ---
 
