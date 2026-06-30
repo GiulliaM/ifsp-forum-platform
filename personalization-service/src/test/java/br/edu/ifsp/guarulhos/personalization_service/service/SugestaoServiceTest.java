@@ -24,10 +24,10 @@ class SugestaoServiceTest {
     private RestClient restClient;
 
     @Mock
-    private RestClient.RequestHeadersUriSpec<?> uriSpec;
+    private RestClient.RequestHeadersUriSpec uriSpec;
 
     @Mock
-    private RestClient.RequestHeadersSpec<?> headersSpec;
+    private RestClient.RequestHeadersSpec headersSpec;
 
     @Mock
     private RestClient.ResponseSpec responseSpec;
@@ -61,17 +61,17 @@ class SugestaoServiceTest {
         exercicio.setTitulo("Exercício médio");
         exercicio.setDificuldade("MEDIO");
 
-        when(restClient.get()).thenReturn((RestClient.RequestHeadersUriSpec) uriSpec);
-        when(uriSpec.uri(contains("/preferencias"))).thenReturn((RestClient.RequestHeadersSpec) headersSpec);
-        when(headersSpec.header(eq("X-User-Id"), anyString())).thenReturn((RestClient.RequestHeadersSpec) headersSpec);
+        when(restClient.get()).thenReturn(uriSpec);
+        when(uriSpec.uri(contains("/preferencias"))).thenReturn(headersSpec);
+        when(headersSpec.header(eq("X-User-Id"), anyString())).thenReturn(headersSpec);
         when(headersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(PreferenciaResponse.class)).thenReturn(pref);
 
-        when(uriSpec.uri(contains("/topicos"))).thenReturn((RestClient.RequestHeadersSpec) headersSpec);
+        when(uriSpec.uri(contains("/topicos"))).thenReturn(headersSpec);
         when(headersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(List.of(topico), List.of(exercicio));
 
-        when(uriSpec.uri(contains("/exercicios"))).thenReturn((RestClient.RequestHeadersSpec) headersSpec);
+        when(uriSpec.uri(contains("/exercicios"))).thenReturn(headersSpec);
 
         SugestaoResponse resultado = sugestaoService.sugerir(1L);
 
@@ -84,9 +84,9 @@ class SugestaoServiceTest {
     @SuppressWarnings("unchecked")
     @Test
     void sugerir_quandoAuthServiceFalha_retornaListasVazias() {
-        when(restClient.get()).thenReturn((RestClient.RequestHeadersUriSpec) uriSpec);
-        when(uriSpec.uri(anyString())).thenReturn((RestClient.RequestHeadersSpec) headersSpec);
-        when(headersSpec.header(anyString(), anyString())).thenReturn((RestClient.RequestHeadersSpec) headersSpec);
+        when(restClient.get()).thenReturn(uriSpec);
+        when(uriSpec.uri(anyString())).thenReturn(headersSpec);
+        when(headersSpec.header(anyString(), anyString())).thenReturn(headersSpec);
         when(headersSpec.retrieve()).thenThrow(new RuntimeException("conexão recusada"));
 
         SugestaoResponse resultado = sugestaoService.sugerir(1L);

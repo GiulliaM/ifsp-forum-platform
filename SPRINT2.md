@@ -35,10 +35,6 @@ Responsabilidades por integrante (mesma base da Sprint 1):
 
 ### 🔵 Suporte Técnico (planejado para Raissa, implementado por Giullia)
 
-> Raissa não chegou a implementar sua parte na Sprint 2. Para o escopo da disciplina ficar
-> completo, Giullia criou o `suporte-service` e implementou US-16/US-17 — por isso essas
-> histórias aparecem aqui como entregues por Giullia, não por Raissa.
-
 | US | O que é | Serviço | Status |
 |----|---------|---------|--------|
 | **US-16** | Abrir chamado de suporte (protocolo, FAQ, status) | suporte | ✅ Concluído (Giullia) |

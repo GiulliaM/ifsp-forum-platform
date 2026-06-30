@@ -5,5 +5,8 @@
     <file url="file://$PROJECT_DIR$/api-gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/auth-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/forum-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gamification-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/personalization-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/suporte-service/src/main/java" charset="UTF-8" />
   </component>
 </project>
