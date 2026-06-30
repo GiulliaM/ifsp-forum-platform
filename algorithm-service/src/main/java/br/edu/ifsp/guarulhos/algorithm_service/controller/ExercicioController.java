@@ -3,6 +3,7 @@ package br.edu.ifsp.guarulhos.algorithm_service.controller;
 import br.edu.ifsp.guarulhos.algorithm_service.dto.request.ExercicioRequest;
 import br.edu.ifsp.guarulhos.algorithm_service.dto.response.ExercicioDetalheResponse;
 import br.edu.ifsp.guarulhos.algorithm_service.dto.response.ExercicioResumoResponse;
+import br.edu.ifsp.guarulhos.algorithm_service.dto.response.PainelPedagogicoItemResponse;
 import br.edu.ifsp.guarulhos.algorithm_service.model.enums.Dificuldade;
 import br.edu.ifsp.guarulhos.algorithm_service.service.ExercicioService;
 import jakarta.validation.Valid;
@@ -37,6 +38,13 @@ public class ExercicioController {
             @PathVariable Long id,
             @RequestHeader(value = "X-User-Id", required = false) Long usuarioId){
         return ResponseEntity.ok(exercicioService.buscarPorId(id, usuarioId));
+    }
+
+    @GetMapping("/painel-pedagogico")
+    public ResponseEntity<List<PainelPedagogicoItemResponse>> painelPedagogico(
+            @RequestParam(defaultValue = "10") int limite,
+            @RequestHeader("X-User-Role") String perfil) {
+        return ResponseEntity.ok(exercicioService.listarPainelPedagogico(limite, perfil));
     }
 
     @PostMapping

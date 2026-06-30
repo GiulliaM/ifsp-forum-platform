@@ -4,6 +4,7 @@ import br.edu.ifsp.guarulhos.algorithm_service.dto.request.CasoTesteRequest;
 import br.edu.ifsp.guarulhos.algorithm_service.dto.request.ExercicioRequest;
 import br.edu.ifsp.guarulhos.algorithm_service.dto.response.ExercicioDetalheResponse;
 import br.edu.ifsp.guarulhos.algorithm_service.dto.response.ExercicioResumoResponse;
+import br.edu.ifsp.guarulhos.algorithm_service.dto.response.PainelPedagogicoItemResponse;
 import br.edu.ifsp.guarulhos.algorithm_service.exception.AcessoNegadoException;
 import br.edu.ifsp.guarulhos.algorithm_service.exception.RecursoNaoEncontradoException;
 import br.edu.ifsp.guarulhos.algorithm_service.model.CasoTeste;
@@ -124,6 +125,29 @@ public class ExercicioService {
         if (submissoes.isEmpty()) return StatusPessoal.NAO_TENTADO;
         boolean resolvido = submissoes.stream().anyMatch(s -> s.getVeredito() == Veredito.ACEITO);
         return resolvido ? StatusPessoal.RESOLVIDO : StatusPessoal.TENTADO;
+    }
+
+    public List<PainelPedagogicoItemResponse> listarPainelPedagogico(int limite, String perfil) {
+        validarModerador(perfil);
+        return exercicioRepository.findByStatus(StatusExercicio.PUBLICADO).stream()
+                .map(e -> {
+                    long total = submissaoRepository.countByExercicioId(e.getId());
+                    double taxaAcerto = calcularTaxaAcerto(e.getId());
+                    double taxaErro = total == 0 ? 0.0 : Math.round((100.0 - taxaAcerto) * 100) / 100.0;
+                    return PainelPedagogicoItemResponse.builder()
+                            .id(e.getId())
+                            .titulo(e.getTitulo())
+                            .dificuldade(e.getDificuldade())
+                            .categoria(e.getCategoria())
+                            .taxaAcerto(taxaAcerto)
+                            .taxaErro(taxaErro)
+                            .totalSubmissoes(total)
+                            .build();
+                })
+                .filter(item -> item.getTotalSubmissoes() > 0)
+                .sorted((a, b) -> Double.compare(b.getTaxaErro(), a.getTaxaErro()))
+                .limit(limite)
+                .toList();
     }
 
     private void validarModerador(String perfil){
