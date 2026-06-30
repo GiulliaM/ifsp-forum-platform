@@ -22,7 +22,10 @@ public class JwtAuthFilter implements GlobalFilter, Ordered{
         //rotas que não precisam de token
         private static final List<String> ROTAS_PUBLICAS = List.of(
                 "/api/auth/registrar",
-                "/api/auth/login"
+                "/api/auth/login",
+                "/api/auth/refresh",
+                "/api/auth/logout",
+                "/api/ranking"
         );
 
         @Value("${jwt.secret}")

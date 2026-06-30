@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: br.edu.ifsp.guarulhos.personalization_service.service.SugestaoServiceTest
--------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.60 s -- in br.edu.ifsp.guarulhos.personalization_service.service.SugestaoServiceTest
