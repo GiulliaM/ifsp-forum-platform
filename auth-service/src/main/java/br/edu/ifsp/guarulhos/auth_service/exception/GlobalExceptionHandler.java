@@ -45,6 +45,11 @@ public class GlobalExceptionHandler {
         return montar(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(RefreshTokenInvalidoException.class)
+    public ResponseEntity<ErroResponse> tratarRefreshTokenInvalido(RefreshTokenInvalidoException ex){
+        return montar(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErroResponse> tratarValidacao(MethodArgumentNotValidException ex){
         String mensagem = ex.getBindingResult().getFieldErrors().stream()
