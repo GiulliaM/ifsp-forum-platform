@@ -697,6 +697,119 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "🆘 Suporte",
+      "description": "Abertura e atendimento de chamados de suporte técnico, com FAQ e painel do moderador (US-16, US-17).",
+      "item": [
+        {
+          "name": "Listar FAQ",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/suporte/faq",
+              "host": ["{{base_url}}"],
+              "path": ["api", "suporte", "faq"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Abrir chamado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoProblema\": \"BUG\",\n  \"descricao\": \"A página de submissões não carrega o histórico de tentativas.\",\n  \"capturaTelaUrl\": \"https://exemplo.com/print.png\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/suporte/chamados",
+              "host": ["{{base_url}}"],
+              "path": ["api", "suporte", "chamados"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Meus chamados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/suporte/chamados/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "suporte", "chamados", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar chamado por protocolo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/suporte/chamados/SUP-2026-000001",
+              "host": ["{{base_url}}"],
+              "path": ["api", "suporte", "chamados", "SUP-2026-000001"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Painel de chamados (MODERADOR)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/suporte/chamados?status=ABERTO",
+              "host": ["{{base_url}}"],
+              "path": ["api", "suporte", "chamados"],
+              "query": [{ "key": "status", "value": "ABERTO" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Responder chamado (MODERADOR)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mensagem\": \"Identificamos o problema e já estamos corrigindo. Retornamos em breve.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/suporte/chamados/1/respostas",
+              "host": ["{{base_url}}"],
+              "path": ["api", "suporte", "chamados", "1", "respostas"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alterar status do chamado (MODERADOR)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"RESOLVIDO\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/suporte/chamados/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "suporte", "chamados", "1", "status"]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

@@ -29,16 +29,16 @@ Responsabilidades por integrante (mesma base da Sprint 1):
 
 | US | O que é | Serviço | Status |
 |----|---------|---------|--------|
-| **US-15** | Inserir imagens e código formatado em publicações | forum | 🔄 Pendente |
-| **US-20** | Painel pedagógico — lado fórum (categorias com mais tópicos sem resposta aceita) | forum | 🔄 Pendente |
-| *(hooks)* | Emitir eventos de pontuação: tópico criado, comentário, like → US-12 | forum | 🔄 Pendente |
+| **US-15** | Inserir imagens e código formatado em publicações | forum | ✅ Concluído |
+| **US-20** | Painel pedagógico — lado fórum (categorias com mais tópicos sem resposta aceita) | forum | ✅ Concluído |
+| *(hooks)* | Emitir eventos de pontuação: tópico criado, comentário, like → US-12 | forum | ✅ Concluído |
 
 ### 🔵 Raissa — Suporte
 
 | US | O que é | Serviço | Status |
 |----|---------|---------|--------|
-| **US-16** | Abrir chamado de suporte (protocolo, FAQ, status) | suporte | 🔄 Pendente |
-| **US-17** | Atender chamados (painel moderador, urgente 48h) | suporte | 🔄 Pendente |
+| **US-16** | Abrir chamado de suporte (protocolo, FAQ, status) | suporte | ✅ Concluído |
+| **US-17** | Atender chamados (painel moderador, urgente 48h) | suporte | ✅ Concluído |
 
 ### ⚪ Fora de escopo (projeto é só de APIs/microsserviços)
 
@@ -146,3 +146,43 @@ usuario_conquista      -- badges desbloqueadas
 - **Giullia** (algorithm) chama esse endpoint quando uma submissão vira `ACEITO` pela primeira vez.
 
 ➡️ **Ordem recomendada:** primeiro o gamification-service com o endpoint de eventos (contrato fechado), depois forum e algorithm plugam as chamadas. Assim Maria não fica bloqueada esperando a lógica de ranking ficar pronta.
+
+---
+
+## 🆘 Arquitetura do Suporte Técnico (US-16 e US-17)
+
+Novo microsserviço **`suporte-service`** (porta **8086**, banco `ifsp_suporte`), seguindo o mesmo padrão de "um serviço, um banco" do `gamification-service`: stateless, sem validar JWT (quem valida é o `api-gateway`, que injeta `X-User-Id`/`X-User-Role`), com `GlobalExceptionHandler` padronizado.
+
+```
+   estudante ──POST /api/suporte/chamados──► suporte-service ──► ifsp_suporte
+   moderador ──GET/POST/PATCH /api/suporte/chamados──┘            :8086
+```
+
+### Modelo de dados (`ifsp_suporte`)
+
+```
+chamado
+├── id, protocolo (único, gerado após o 1º save: "SUP-2026-000123")
+├── usuario_id, tipo_problema (BUG/DUVIDA/SUGESTAO/OUTRO), descricao, captura_tela_url
+├── status (ABERTO, EM_ATENDIMENTO, RESOLVIDO, ENCERRADO)
+└── criado_em, atualizado_em (usado para calcular "urgente")
+
+resposta_chamado  -- respostas do moderador, FK -> chamado
+faq_entrada       -- catálogo de FAQ exibido antes da abertura, populado via DataInitializer
+```
+
+"Urgente" (CA4 US-17) é **calculado em tempo de leitura**: chamado em ABERTO/EM_ATENDIMENTO sem interação (`atualizado_em`) há mais de 48h.
+
+### Endpoints do `suporte-service`
+
+| Método | Rota | Quem | Descrição |
+|--------|------|------|-----------|
+| GET | `/api/suporte/faq` | autenticado | FAQ exibida antes da abertura (US-16, CA4) |
+| POST | `/api/suporte/chamados` | estudante | abre chamado, retorna protocolo (US-16, CA1/CA2) |
+| GET | `/api/suporte/chamados/me` | estudante | lista os próprios chamados com status (US-16, CA3) |
+| GET | `/api/suporte/chamados/{protocolo}` | dono ou moderador | detalhe + respostas |
+| GET | `/api/suporte/chamados` | moderador | painel com filtro `?status=` e flag `urgente` (US-17, CA1/CA4) |
+| POST | `/api/suporte/chamados/{id}/respostas` | moderador | responde chamado (US-17, CA2) |
+| PATCH | `/api/suporte/chamados/{id}/status` | moderador | altera status: EM_ATENDIMENTO/RESOLVIDO/ENCERRADO (US-17, CA3) |
+
+> **Notificação por e-mail (CA2 de US-16/US-17), fora de escopo:** o projeto não tem nenhuma infraestrutura de envio de e-mail (não há `JavaMailSender`/SMTP em nenhum serviço). Como já decidido para US-15/US-18, o backend entrega o dado em tempo real via API (protocolo na resposta da abertura, resposta/status consultáveis imediatamente); o disparo de e-mail/push em si é responsabilidade de uma camada de notificação que não existe neste projeto só-API.

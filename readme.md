@@ -25,14 +25,14 @@ Inspirada no Stack Overflow e no LeetCode, a plataforma oferece fórum colaborat
                                   │  validação JWT) │
                                   └────────┬────────┘
                                            │
-          ┌──────────────┬─────────────────┼──────────────────┬────────────────────┐
-          │              │                 │                  │                    │
-   ┌──────▼──────┐  ┌────▼─────────┐  ┌───▼──────────┐  ┌───▼────────────┐  ┌────▼──────────────┐
-   │auth-service │  │forum-service │  │algorithm-    │  │gamification-   │  │personalization-   │
-   │   :8081     │  │   :8082      │  │service :8083 │  │service  :8084  │  │service     :8085  │
-   │             │  │              │  │              │  │                │  │                   │
-   │ ifsp_auth   │  │ ifsp_forum   │  │ifsp_algorithm│  │ifsp_gamificati │  │   (sem banco)     │
-   └─────────────┘  └──────────────┘  └──────────────┘  └────────────────┘  └───────────────────┘
+          ┌──────────────┬─────────────────┼──────────────────┬────────────────────┬───────────────┐
+          │              │                 │                  │                    │               │
+   ┌──────▼──────┐  ┌────▼─────────┐  ┌───▼──────────┐  ┌───▼────────────┐  ┌────▼──────────────┐ ┌▼─────────────┐
+   │auth-service │  │forum-service │  │algorithm-    │  │gamification-   │  │personalization-   │ │suporte-      │
+   │   :8081     │  │   :8082      │  │service :8083 │  │service  :8084  │  │service     :8085  │ │service :8086 │
+   │             │  │              │  │              │  │                │  │                   │ │              │
+   │ ifsp_auth   │  │ ifsp_forum   │  │ifsp_algorithm│  │ifsp_gamificati │  │   (sem banco)     │ │ ifsp_suporte │
+   └─────────────┘  └──────────────┘  └──────────────┘  └────────────────┘  └───────────────────┘ └──────────────┘
 ```
 
 Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre serviços passa pelo gateway, que valida o JWT e injeta `X-User-Id` e `X-User-Role` nos headers.
@@ -47,10 +47,11 @@ Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre s
 |---------|-------|-------|--------------|--------|
 | `api-gateway` | 8080 | — | Roteamento + JWT | ✅ Funcional (Spring Boot 3.2.5) |
 | `auth-service` | 8081 | `ifsp_auth` | US-19, US-14 | ✅ Concluído |
-| `forum-service` | 8082 | `ifsp_forum` | US-01 a US-06 | ✅ Concluído |
+| `forum-service` | 8082 | `ifsp_forum` | US-01 a US-06, US-15, US-20 (fórum) | ✅ Concluído |
 | `algorithm-service` | 8083 | `ifsp_algorithm` | US-07, 08, 09, 10, US-20 | ✅ Concluído |
 | `gamification-service` | 8084 | `ifsp_gamification` | US-11, US-12 | ✅ Concluído |
 | `personalization-service` | 8085 | — | US-13 | ✅ Concluído |
+| `suporte-service` | 8086 | `ifsp_suporte` | US-16, US-17 | ✅ Concluído |
 
 ---
 
@@ -79,6 +80,7 @@ CREATE DATABASE ifsp_auth;
 CREATE DATABASE ifsp_forum;
 CREATE DATABASE ifsp_algorithm;
 CREATE DATABASE ifsp_gamification;
+CREATE DATABASE ifsp_suporte;
 ```
 
 > ℹ️ O `personalization-service` não usa banco de dados — agrega dados dos outros serviços via HTTP.
@@ -105,6 +107,7 @@ cd forum-service;           .\mvnw.cmd spring-boot:run
 cd algorithm-service;       .\mvnw.cmd spring-boot:run
 cd gamification-service;    .\mvnw.cmd spring-boot:run
 cd personalization-service; .\mvnw.cmd spring-boot:run
+cd suporte-service;         .\mvnw.cmd spring-boot:run
 ```
 
 ```bash
@@ -114,6 +117,7 @@ cd forum-service          && ./mvnw spring-boot:run
 cd algorithm-service      && ./mvnw spring-boot:run
 cd gamification-service   && ./mvnw spring-boot:run
 cd personalization-service && ./mvnw spring-boot:run
+cd suporte-service        && ./mvnw spring-boot:run
 ```
 
 > ⚠️ Suba o `auth-service` antes dos outros — ele é responsável pela geração do JWT.
@@ -204,6 +208,12 @@ Headers: X-User-Id: 1
 | POST | `/api/topicos/{id}/seguir` | Seguir tópico | ✅ | ESTUDANTE+ |
 | DELETE | `/api/topicos/{id}/seguir` | Desseguir tópico | ✅ | ESTUDANTE+ |
 | GET | `/api/topicos/seguidos?categoria=&ordem=desc` | Listar tópicos seguidos (filtro por categoria, ordenação por data, destaque de novidades) | ✅ | ESTUDANTE+ |
+| GET | `/api/topicos/sugeridos` | Tópicos sugeridos com base no histórico de participação do usuário (US-13) | ✅ | ESTUDANTE+ |
+| GET | `/api/topicos/metricas/sem-resposta?periodo=7` | Painel pedagógico: categorias com mais tópicos sem resposta nos últimos 7 ou 30 dias (US-20) | ✅ | MODERADOR |
+
+> ℹ️ **US-15:** tópicos e comentários aceitam o campo opcional `imageUrl`; o backend só armazena/serve a URL (upload e preview ficam fora de escopo, ver seção de UI).
+
+> ℹ️ **Pontuação (US-12):** ao criar tópico, comentar ou receber like, o `forum-service` notifica o `gamification-service` via `POST /api/pontos/eventos`. O ranking do fórum é consultado em `gamification-service` (`GET /api/ranking?escopo=FORUM`), não há endpoint de ranking local no `forum-service`.
 
 **Exemplo de criação de tópico:**
 ```json
@@ -331,6 +341,41 @@ Headers: X-User-Id: 1, X-User-Role: ESTUDANTE
 
 ---
 
+### Suporte Service (`localhost:8086`)
+
+| Método | Rota | Descrição | Auth? | Role |
+|--------|------|-----------|-------|------|
+| GET | `/api/suporte/faq` | Lista a FAQ exibida antes da abertura de um chamado (US-16) | ✅ | — |
+| POST | `/api/suporte/chamados` | Abre chamado de suporte, retorna o protocolo (US-16) | ✅ | ESTUDANTE+ |
+| GET | `/api/suporte/chamados/me` | Lista os próprios chamados com status (US-16) | ✅ | ESTUDANTE+ |
+| GET | `/api/suporte/chamados/{protocolo}` | Detalhe do chamado + respostas (dono ou moderador) | ✅ | Dono/MODERADOR |
+| GET | `/api/suporte/chamados?status=` | Painel do moderador, com flag `urgente` (US-17) | ✅ | MODERADOR |
+| POST | `/api/suporte/chamados/{id}/respostas` | Responde um chamado (US-17) | ✅ | MODERADOR |
+| PATCH | `/api/suporte/chamados/{id}/status` | Altera status: `EM_ATENDIMENTO`, `RESOLVIDO`, `ENCERRADO` (US-17) | ✅ | MODERADOR |
+
+> ℹ️ **Protocolo:** gerado no formato `SUP-AAAA-NNNNNN` ao abrir o chamado. **Urgência (CA4 US-17):** calculada em tempo de leitura — chamado em `ABERTO`/`EM_ATENDIMENTO` sem nenhuma interação há mais de 48h.
+
+> ℹ️ **Notificação por e-mail:** o projeto não possui infraestrutura de envio de e-mail (sem `JavaMailSender`/SMTP em nenhum serviço). O protocolo e as respostas/status ficam disponíveis imediatamente via API; o disparo de e-mail/push é responsabilidade de uma camada de notificação fora do escopo deste projeto só-API.
+
+**Exemplo de abertura de chamado (US-16):**
+```json
+POST /api/suporte/chamados
+Headers: X-User-Id: 1, X-User-Role: ESTUDANTE
+{
+  "tipoProblema": "BUG",
+  "descricao": "A página de submissões não carrega o histórico de tentativas.",
+  "capturaTelaUrl": "https://exemplo.com/print.png"
+}
+```
+
+**Exemplo de painel do moderador (US-17):**
+```json
+GET /api/suporte/chamados?status=ABERTO
+Headers: X-User-Role: MODERADOR
+```
+
+---
+
 ## 🗂️ Estrutura de pacotes
 
 Todos os serviços seguem o mesmo padrão:
@@ -375,6 +420,7 @@ SHOW TABLES;
 | `ifsp_forum` | `topicos`, `comentarios`, `likes`, `seguimentos` |
 | `ifsp_algorithm` | `exercicios`, `casos_teste`, `submissoes`, `resultados_caso_teste` |
 | `ifsp_gamification` | `pontos_evento`, `conquista`, `usuario_conquista` |
+| `ifsp_suporte` | `chamado`, `resposta_chamado`, `faq_entrada` |
 
 ---
 

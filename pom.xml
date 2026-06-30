@@ -18,5 +18,6 @@
         <module>api-gateway</module>
         <module>gamification-service</module>
         <module>personalization-service</module>
+        <module>suporte-service</module>
     </modules>
 </project>
