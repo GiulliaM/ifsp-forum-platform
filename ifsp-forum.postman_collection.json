@@ -20,7 +20,7 @@
   ],
   "item": [
     {
-      "name": "🔐 Auth Service",
+      "name": " Auth Service",
       "description": "Autenticação, refresh token e preferências de aprendizado (US-19, US-14).",
       "item": [
         {
@@ -194,7 +194,7 @@
       ]
     },
     {
-      "name": "💬 Fórum",
+      "name": " Fórum",
       "description": "Tópicos, comentários, likes e seguimentos (US-01 a US-06).",
       "item": [
         {
@@ -437,7 +437,7 @@
       ]
     },
     {
-      "name": "⚙️ Algoritmos",
+      "name": " Algoritmos",
       "description": "Catálogo de exercícios, submissões, feedback e painel pedagógico (US-07 a US-10, US-20).",
       "item": [
         {
@@ -576,7 +576,7 @@
       ]
     },
     {
-      "name": "🏆 Gamificação",
+      "name": " Gamificação",
       "description": "Pontuação por contribuição, badges e ranking de usuários (US-11, US-12).",
       "item": [
         {
@@ -680,7 +680,7 @@
       ]
     },
     {
-      "name": "🎯 Personalização",
+      "name": " Personalização",
       "description": "Sugestões personalizadas de tópicos e exercícios com base nas preferências do usuário (US-13).",
       "item": [
         {
