@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-/**
- * Item do catálogo de exercícios, com dificuldade, taxa de acerto e status pessoal (US-07 CA1/CA4).
- */
 @Data
 @Builder
 @AllArgsConstructor

@@ -22,10 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Regras de negócio do catálogo de exercícios: cadastro pelo moderador (US-10) e
- * listagem/detalhe com taxa de acerto e status pessoal do usuário (US-07).
- */
 @Service
 @RequiredArgsConstructor
 public class ExercicioService {

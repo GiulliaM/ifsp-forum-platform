@@ -14,10 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Endpoints REST do catálogo de exercícios: listagem e detalhe públicos (US-07) e
- * cadastro restrito a moderadores (US-10).
- */
 @RestController
 @RequestMapping("/api/exercicios")
 @RequiredArgsConstructor

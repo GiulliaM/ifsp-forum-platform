@@ -75,9 +75,10 @@ class SugestaoServiceTest {
 
         SugestaoResponse resultado = sugestaoService.sugerir(1L);
 
-        assertThat(resultado).isNotNull();
-        assertThat(resultado.getTopicos()).isNotNull();
-        assertThat(resultado.getExercicios()).isNotNull();
+        assertThat(resultado.getTopicos()).hasSize(1);
+        assertThat(resultado.getTopicos().get(0).getId()).isEqualTo(1L);
+        assertThat(resultado.getExercicios()).hasSize(1);
+        assertThat(resultado.getExercicios().get(0).getId()).isEqualTo(1L);
     }
 
     @SuppressWarnings("unchecked")

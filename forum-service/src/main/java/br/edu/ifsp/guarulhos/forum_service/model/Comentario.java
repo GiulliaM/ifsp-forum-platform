@@ -23,7 +23,6 @@ public class Comentario {
     @Column(name = "autor_id", nullable = false)
     private Long autorId;
 
-    // Comentário pai — permite respostas aninhadas (threads)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Comentario parent;

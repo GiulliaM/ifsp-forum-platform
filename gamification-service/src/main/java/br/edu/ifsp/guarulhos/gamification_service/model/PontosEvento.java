@@ -7,9 +7,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * Registro de um evento pontuável já valorado. O total de pontos de um usuário é a soma
- * de seus eventos (US-12). A constraint única garante idempotência: o mesmo fato
- * (tipo + referência + usuário) não pontua duas vezes.
+ * A constraint única garante idempotência: o mesmo fato (tipo + referência + usuário)
+ * não pontua duas vezes.
  */
 @Entity
 @Table(
@@ -38,7 +37,6 @@ public class PontosEvento {
     @Column(name = "usuario_id", nullable = false)
     private Long usuarioId;
 
-    /** Id do tópico/comentário/exercício que originou o evento. */
     @Column(name = "referencia_id")
     private Long referenciaId;
 

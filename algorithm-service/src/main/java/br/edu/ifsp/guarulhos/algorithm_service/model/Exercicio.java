@@ -7,10 +7,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-/**
- * Exercício do catálogo de algoritmos, com enunciado, classificação, exemplos e
- * status de publicação (US-07 e US-10).
- */
 @Entity
 @Table(name = "exercicios")
 @Getter

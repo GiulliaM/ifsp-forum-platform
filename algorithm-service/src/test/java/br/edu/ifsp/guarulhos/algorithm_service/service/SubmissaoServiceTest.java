@@ -32,10 +32,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Testes unitários do juiz por comparação: vereditos de aceite e resposta errada,
- * normalização de saídas e regras de feedback restrito ao dono da submissão.
- */
 @ExtendWith(MockitoExtension.class)
 class SubmissaoServiceTest {
 

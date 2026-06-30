@@ -8,8 +8,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * Chamado de suporte técnico (US-16/US-17). O protocolo só existe após o primeiro save
- * (depende do id gerado pelo banco), por isso é gravado em uma segunda escrita pelo service.
+ * O protocolo só existe após o primeiro save (depende do id gerado pelo banco), por isso
+ * é gravado em uma segunda escrita pelo service.
  */
 @Entity
 @Table(name = "chamado")

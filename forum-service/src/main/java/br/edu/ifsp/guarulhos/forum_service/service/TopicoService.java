@@ -25,10 +25,6 @@ public class TopicoService {
     private final LikeRepository likeRepository;
     private final PontuacaoService pontuacaoService;
 
-    /*
-    * US-01 - criar um novo tópico de discussão. O autor vem do header X-User-Id
-    * que o gateway injeta depois de validar o JWT.
-    * */
     public TopicoResponse criar(TopicoRequest request, Long autorId){
         if(topicoRepository.existsByTituloIgnoreCase(request.getTitulo())){
             throw new RegraNegocioException("Já existe um tópico com este título");
@@ -49,9 +45,6 @@ public class TopicoService {
         return montarResponse(topico);
     }
 
-    /*
-    * US-01 - listar tópicos. Os fixados aparecem primeiro, depois os mais recentes.
-    * */
     public List<TopicoResponse> listar(){
         return topicoRepository.findAll().stream()
                 .sorted(Comparator.comparing(Topico::isFixado).reversed()
@@ -66,9 +59,6 @@ public class TopicoService {
         return montarResponse(topico);
     }
 
-    /*
-    * US-04 - moderação: encerrar discussão. Só moderador pode.
-    * */
     public TopicoResponse encerrar(Long id, String perfil){
         validarModerador(perfil);
         Topico topico = topicoRepository.findById(id)
@@ -78,9 +68,6 @@ public class TopicoService {
         return montarResponse(topico);
     }
 
-    /*
-    * US-04 - moderação: fixar/desafixar tópico. Só moderador pode.
-    * */
     public TopicoResponse fixar(Long id, String perfil){
         validarModerador(perfil);
         Topico topico = topicoRepository.findById(id)
@@ -90,9 +77,6 @@ public class TopicoService {
         return montarResponse(topico);
     }
 
-    /*
-    * US-04 - moderação: excluir tópico. Só moderador pode.
-    * */
     public void deletar(Long id, String perfil){
         validarModerador(perfil);
         Topico topico = topicoRepository.findById(id)

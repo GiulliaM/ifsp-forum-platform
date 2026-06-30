@@ -7,10 +7,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-/**
- * Registro de uma submissão de solução, com código, veredito e métricas, que compõe
- * o histórico do estudante (US-08).
- */
 @Entity
 @Table(name = "submissoes")
 @Getter

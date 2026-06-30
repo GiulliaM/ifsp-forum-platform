@@ -5,9 +5,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-/**
- * Resposta de um moderador a um chamado de suporte (US-17).
- */
 @Entity
 @Table(name = "resposta_chamado")
 @Getter

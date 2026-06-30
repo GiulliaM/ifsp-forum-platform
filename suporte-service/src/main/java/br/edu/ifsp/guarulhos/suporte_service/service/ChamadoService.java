@@ -21,9 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Regras de negócio dos chamados de suporte técnico (US-16, US-17).
- */
 @Service
 @RequiredArgsConstructor
 public class ChamadoService {

@@ -8,8 +8,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * Item resumido para a listagem do estudante ("/me") e para o painel do moderador (US-17),
- * que inclui a flag "urgente" (sem resposta há mais de 48h).
+ * A flag "urgente" indica chamado sem resposta há mais de 48h.
  */
 @Data
 @Builder

@@ -2,6 +2,7 @@ package br.edu.ifsp.guarulhos.forum_service.service;
 
 import br.edu.ifsp.guarulhos.forum_service.exception.RecursoNaoEncontradoException;
 import br.edu.ifsp.guarulhos.forum_service.model.Like;
+import br.edu.ifsp.guarulhos.forum_service.model.Topico;
 import br.edu.ifsp.guarulhos.forum_service.model.enums.TipoLike;
 import br.edu.ifsp.guarulhos.forum_service.repository.ComentarioRepository;
 import br.edu.ifsp.guarulhos.forum_service.repository.LikeRepository;
@@ -30,12 +31,15 @@ class LikeServiceTest {
     private TopicoRepository topicoRepository;
     @Mock
     private ComentarioRepository comentarioRepository;
+    @Mock
+    private PontuacaoService pontuacaoService;
     @InjectMocks
     private LikeService likeService;
 
     @Test
     void alternarLikeTopico_quandoAindaNaoCurtiu_salvaLike() {
-        when(topicoRepository.existsById(1L)).thenReturn(true);
+        Topico topico = Topico.builder().id(1L).autorId(9L).build();
+        when(topicoRepository.findById(1L)).thenReturn(Optional.of(topico));
         when(likeRepository.findByUsuarioIdAndTipoAndReferenciaId(5L, TipoLike.TOPICO, 1L))
                 .thenReturn(Optional.empty());
         when(likeRepository.countByTipoAndReferenciaId(TipoLike.TOPICO, 1L)).thenReturn(1L);
@@ -51,7 +55,8 @@ class LikeServiceTest {
     void alternarLikeTopico_quandoJaCurtiu_removeLike() {
         Like like = Like.builder()
                 .id(1L).usuarioId(5L).tipo(TipoLike.TOPICO).referenciaId(1L).build();
-        when(topicoRepository.existsById(1L)).thenReturn(true);
+        Topico topico = Topico.builder().id(1L).autorId(9L).build();
+        when(topicoRepository.findById(1L)).thenReturn(Optional.of(topico));
         when(likeRepository.findByUsuarioIdAndTipoAndReferenciaId(5L, TipoLike.TOPICO, 1L))
                 .thenReturn(Optional.of(like));
         when(likeRepository.countByTipoAndReferenciaId(TipoLike.TOPICO, 1L)).thenReturn(0L);
@@ -65,7 +70,7 @@ class LikeServiceTest {
 
     @Test
     void alternarLikeTopico_quandoTopicoNaoExiste_lancaRecursoNaoEncontrado() {
-        when(topicoRepository.existsById(1L)).thenReturn(false);
+        when(topicoRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> likeService.alternarLikeTopico(1L, 5L))
                 .isInstanceOf(RecursoNaoEncontradoException.class);

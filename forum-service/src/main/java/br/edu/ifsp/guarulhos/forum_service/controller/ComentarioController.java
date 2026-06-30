@@ -17,7 +17,6 @@ public class ComentarioController {
     private final ComentarioService comentarioService;
     private final LikeService likeService;
 
-    // US-02 - editar o próprio comentário (até 30 min)
     @PutMapping("/{id}")
     public ResponseEntity<ComentarioResponse> editar(@PathVariable Long id,
                                                      @Valid @RequestBody ComentarioRequest request,
@@ -25,7 +24,6 @@ public class ComentarioController {
         return ResponseEntity.ok(comentarioService.editar(id, request, usuarioId));
     }
 
-    // US-02 - excluir o próprio comentário (até 30 min)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id,
                                         @RequestHeader("X-User-Id") Long usuarioId){
@@ -33,7 +31,6 @@ public class ComentarioController {
         return ResponseEntity.noContent().build();
     }
 
-    // US-03 - curtir/descurtir um comentário
     @PostMapping("/{id}/like")
     public ResponseEntity<Long> curtir(@PathVariable Long id,
                                        @RequestHeader("X-User-Id") Long usuarioId){

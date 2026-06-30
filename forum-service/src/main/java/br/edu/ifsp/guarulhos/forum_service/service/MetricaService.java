@@ -15,10 +15,6 @@ public class MetricaService {
 
     private final TopicoRepository topicoRepository;
 
-    /*
-    * US-20 - categorias com mais tópicos sem nenhuma resposta no período.
-    * Só aceita 7 ou 30 dias conforme especificado no backlog.
-    * */
     public List<MetricaCategoriaResponse> categoriasSemResposta(int dias) {
         if (dias != 7 && dias != 30) {
             throw new RegraNegocioException("Período inválido. Informe 7 ou 30 dias.");

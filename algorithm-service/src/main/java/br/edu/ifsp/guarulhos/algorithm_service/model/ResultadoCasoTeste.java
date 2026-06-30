@@ -3,10 +3,6 @@ package br.edu.ifsp.guarulhos.algorithm_service.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * Resultado individual de um caso de teste dentro de uma submissão, guardando entrada,
- * saída esperada e saída obtida para compor o feedback detalhado (US-09).
- */
 @Entity
 @Table(name = "resultados_caso_teste")
 @Getter

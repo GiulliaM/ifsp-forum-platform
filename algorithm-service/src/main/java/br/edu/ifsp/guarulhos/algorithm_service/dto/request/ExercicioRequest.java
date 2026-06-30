@@ -10,9 +10,6 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * Dados recebidos para cadastrar ou publicar um exercício no catálogo (US-10).
- */
 @Data
 public class ExercicioRequest {
 

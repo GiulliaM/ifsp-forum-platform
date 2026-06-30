@@ -5,9 +5,9 @@
 
 Responsabilidades por integrante (mesma base da Sprint 1):
 
-- **Giullia** → `auth-service` + `api-gateway` + `algorithm-service`
+- **Giullia** → `auth-service` + `api-gateway` + `algorithm-service` + `gamification-service` + `personalization-service`
 - **Maria Eduarda** → `forum-service`
-- **Raissa** → Suporte Técnico
+- **Raissa** → Suporte Técnico (US-16, US-17) — não entregue na Sprint 2; implementado por Giullia para fechar o escopo (ver nota abaixo)
 
 ---
 
@@ -33,12 +33,16 @@ Responsabilidades por integrante (mesma base da Sprint 1):
 | **US-20** | Painel pedagógico — lado fórum (categorias com mais tópicos sem resposta aceita) | forum | ✅ Concluído |
 | *(hooks)* | Emitir eventos de pontuação: tópico criado, comentário, like → US-12 | forum | ✅ Concluído |
 
-### 🔵 Raissa — Suporte
+### 🔵 Suporte Técnico (planejado para Raissa, implementado por Giullia)
+
+> Raissa não chegou a implementar sua parte na Sprint 2. Para o escopo da disciplina ficar
+> completo, Giullia criou o `suporte-service` e implementou US-16/US-17 — por isso essas
+> histórias aparecem aqui como entregues por Giullia, não por Raissa.
 
 | US | O que é | Serviço | Status |
 |----|---------|---------|--------|
-| **US-16** | Abrir chamado de suporte (protocolo, FAQ, status) | suporte | ✅ Concluído |
-| **US-17** | Atender chamados (painel moderador, urgente 48h) | suporte | ✅ Concluído |
+| **US-16** | Abrir chamado de suporte (protocolo, FAQ, status) | suporte | ✅ Concluído (Giullia) |
+| **US-17** | Atender chamados (painel moderador, urgente 48h) | suporte | ✅ Concluído (Giullia) |
 
 ### ⚪ Fora de escopo (projeto é só de APIs/microsserviços)
 

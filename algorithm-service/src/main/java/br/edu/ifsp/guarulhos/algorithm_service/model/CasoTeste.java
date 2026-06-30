@@ -3,10 +3,6 @@ package br.edu.ifsp.guarulhos.algorithm_service.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * Caso de teste de um exercício, cuja saída esperada é comparada com a saída enviada
- * pelo estudante durante a avaliação da submissão (US-08 e US-10).
- */
 @Entity
 @Table(name = "casos_teste")
 @Getter

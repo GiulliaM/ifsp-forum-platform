@@ -6,8 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * Evento pontuável enviado pelos serviços de origem (forum/algorithm). O emissor informa
- * apenas o que aconteceu; o valor em pontos é calculado aqui (US-12).
+ * O emissor informa apenas o que aconteceu; o valor em pontos é calculado aqui.
  */
 @Data
 public class EventoPontosRequest {

@@ -36,7 +36,7 @@ class MetricaServiceTest {
     void categoriasSemResposta_periodo7_retornaListaCorreta() {
         Object[] row = {"Java", 3L};
         when(topicoRepository.findCategoriasSemResposta(any(LocalDateTime.class)))
-                .thenReturn(List.of(row));
+                .thenReturn(List.<Object[]>of(row));
 
         List<MetricaCategoriaResponse> resultado = metricaService.categoriasSemResposta(7);
 
@@ -51,7 +51,7 @@ class MetricaServiceTest {
         Object[] row1 = {"Algoritmos", 5L};
         Object[] row2 = {"Banco de Dados", 2L};
         when(topicoRepository.findCategoriasSemResposta(any(LocalDateTime.class)))
-                .thenReturn(List.of(row1, row2));
+                .thenReturn(List.<Object[]>of(row1, row2));
 
         List<MetricaCategoriaResponse> resultado = metricaService.categoriasSemResposta(30);
 

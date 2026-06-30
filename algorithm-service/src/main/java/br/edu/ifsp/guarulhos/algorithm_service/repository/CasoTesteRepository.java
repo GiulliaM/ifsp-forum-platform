@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 /**
- * Acesso aos casos de teste de um exercício, em ordem estável para casar com a ordem
- * das saídas enviadas na submissão (US-08).
+ * A ordem estável é necessária para casar posicionalmente com a lista de saídas
+ * enviadas na submissão.
  */
 public interface CasoTesteRepository extends JpaRepository<CasoTeste, Long> {
 

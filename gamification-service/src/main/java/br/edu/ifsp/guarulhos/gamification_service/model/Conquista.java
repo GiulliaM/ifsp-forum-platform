@@ -3,10 +3,6 @@ package br.edu.ifsp.guarulhos.gamification_service.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * Catálogo de conquistas (badges) que o estudante pode desbloquear ao atingir marcos,
- * exibidas no perfil (US-12, CA3).
- */
 @Entity
 @Table(name = "conquista")
 @Getter

@@ -35,6 +35,8 @@ class TopicoServiceTest {
     private ComentarioRepository comentarioRepository;
     @Mock
     private LikeRepository likeRepository;
+    @Mock
+    private PontuacaoService pontuacaoService;
     @InjectMocks
     private TopicoService topicoService;
 
@@ -80,7 +82,6 @@ class TopicoServiceTest {
     void encerrar_quandoNaoEhModerador_lancaAcessoNegado() {
         assertThatThrownBy(() -> topicoService.encerrar(1L, "ESTUDANTE"))
                 .isInstanceOf(AcessoNegadoException.class);
-        // nem chega a procurar o tópico se não tem permissão
         verify(topicoRepository, never()).findById(any());
     }
 

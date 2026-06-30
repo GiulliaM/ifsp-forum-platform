@@ -11,10 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Endpoints REST das submissões: envio de solução e histórico do estudante (US-08) e
- * feedback detalhado por caso de teste (US-09).
- */
 @RestController
 @RequestMapping("/api/submissoes")
 @RequiredArgsConstructor

@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-/**
- * Detalhe de um exercício, com enunciado, restrições e exemplos de entrada/saída (US-07 CA3).
- */
 @Data
 @Builder
 @AllArgsConstructor

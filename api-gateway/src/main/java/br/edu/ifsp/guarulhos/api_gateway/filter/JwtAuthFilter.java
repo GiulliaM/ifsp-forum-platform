@@ -3,7 +3,7 @@ package br.edu.ifsp.guarulhos.api_gateway.filter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value; // ✅ correto
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -19,7 +19,6 @@ import java.util.List;
 @Component
 public class JwtAuthFilter implements GlobalFilter, Ordered{
 
-        //rotas que não precisam de token
         private static final List<String> ROTAS_PUBLICAS = List.of(
                 "/api/auth/registrar",
                 "/api/auth/login",
@@ -36,7 +35,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered{
             String caminho = exchange.getRequest().getURI().getPath();
 
             if (ROTAS_PUBLICAS.stream().anyMatch(caminho::startsWith)){
-                return chain.filter(exchange); // rota publica passa sem o token
+                return chain.filter(exchange);
             }
 
             String authHeader = exchange.getRequest()
@@ -45,11 +44,11 @@ public class JwtAuthFilter implements GlobalFilter, Ordered{
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")){
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete(); // se rot nn for publica e nn tiver token, retornar 401
+                return exchange.getResponse().setComplete();
             }
 
             try {
-                String token = authHeader.substring(7);//valida o token e extrai os dados
+                String token = authHeader.substring(7);
                 Claims claims = Jwts.parser()
                         .verifyWith(Keys.hmacShaKeyFor(
                                 secret.getBytes(StandardCharsets.UTF_8)
@@ -60,8 +59,8 @@ public class JwtAuthFilter implements GlobalFilter, Ordered{
 
                 ServerWebExchange exchangeModificado = exchange.mutate()
                         .request(r -> r
-                                .header("X-User-Id", claims.getSubject()) //injeta id do usuario nos headers
-                                .header("X-User-Role", claims.get("perfil", String.class)))//injeta perfil do usuario nos headers
+                                .header("X-User-Id", claims.getSubject())
+                                .header("X-User-Role", claims.get("perfil", String.class)))
                         .build();
 
                         return chain.filter(exchangeModificado);

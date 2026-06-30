@@ -6,8 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * Conquista efetivamente desbloqueada por um usuário. A constraint única evita
- * desbloquear a mesma badge duas vezes (US-12, CA3).
+ * A constraint única evita desbloquear a mesma badge duas vezes para o mesmo usuário.
  */
 @Entity
 @Table(

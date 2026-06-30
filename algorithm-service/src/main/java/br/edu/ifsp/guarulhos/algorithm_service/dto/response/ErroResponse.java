@@ -5,9 +5,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * Corpo padronizado de erro retornado pelo tratador global de exceções.
- */
 @Data
 @AllArgsConstructor
 public class ErroResponse {

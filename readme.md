@@ -10,9 +10,9 @@ Inspirada no Stack Overflow e no LeetCode, a plataforma oferece fórum colaborat
 
 | Nome | RA | Responsabilidade |
 |------|----|-----------------|
-| Giullia Maria de Camargo | GU305554X | `auth-service` + `api-gateway` + `algorithm-service` |
+| Giullia Maria de Camargo | GU305554X | `auth-service` + `api-gateway` + `algorithm-service` + `gamification-service` + `personalization-service` + `suporte-service` |
 | Maria Eduarda Rodrigues | GU3054985 | `forum-service` |
-| Raissa Carla Ferreira | GU3054781 | Suporte Técnico (Sprint 2 — US-16 e US-17) |
+| Raissa Carla Ferreira | GU3054781 | Suporte Técnico — planejado para a Sprint 2, não entregue; `suporte-service` (US-16/US-17) acabou implementado por Giullia para fechar o escopo |
 
 ---
 
@@ -52,6 +52,20 @@ Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre s
 | `gamification-service` | 8084 | `ifsp_gamification` | US-11, US-12 | ✅ Concluído |
 | `personalization-service` | 8085 | — | US-13 | ✅ Concluído |
 | `suporte-service` | 8086 | `ifsp_suporte` | US-16, US-17 | ✅ Concluído |
+
+---
+
+## 🧩 Decisões de arquitetura
+
+| Decisão | Por quê |
+|---|---|
+| Um banco de dados por serviço | Cada serviço é dono do seu schema; evita acoplamento entre times e permite evoluir/trocar um banco sem afetar os outros (database-per-service). |
+| Gateway valida o JWT e injeta `X-User-Id`/`X-User-Role`; os outros serviços confiam nesses headers | Centraliza a validação em um único ponto. Os serviços internos ficam stateless e simples — não duplicam lógica de criptografia/assinatura de token. |
+| `gamification-service` centraliza a pontuação, em vez de cada serviço calcular seus próprios pontos | A tabela de pontos é regra de negócio da gamificação; forum e algorithm só avisam "o quê" aconteceu (evento), não decidem "quanto vale". Mudar a pontuação não exige tocar em forum/algorithm. |
+| Idempotência de eventos de pontuação via constraint `UNIQUE (tipo, referencia_id, usuario_id)` | Evita pontuar duas vezes por reenvio de requisição ou múltiplos likes/unlikes, sem precisar de lock distribuído ou fila — suficiente para o escopo da disciplina. |
+| `algorithm-service` julga por comparação de saídas, não executa código em sandbox | Implementar um sandbox de execução real (Docker, gVisor etc.) está fora do escopo da disciplina; a submissão envia as saídas já produzidas localmente e o serviço compara com o gabarito, mantendo o fluxo de veredito (US-09) sem o risco de rodar código arbitrário. |
+| Sem infraestrutura de e-mail/push (nenhum `JavaMailSender`/SMTP em nenhum serviço) | O projeto é só-API; os dados que seriam notificados (protocolo de chamado, respostas, status) ficam disponíveis instantaneamente via endpoints. O disparo de notificação em si é responsabilidade de uma camada que não existe neste projeto. |
+| `personalization-service` não tem banco próprio | Ele apenas agrega, em tempo de requisição, dados que já existem em `auth-service` (preferências), `forum-service` (tópicos) e `algorithm-service` (exercícios) — persistir uma cópia geraria dado duplicado e desatualizado. |
 
 ---
 
@@ -137,6 +151,19 @@ O token contém:
 - `perfil` — papel: `ESTUDANTE`, `MODERADOR` ou `ADMINISTRADOR`
 
 Os outros serviços leem os headers `X-User-Id` e `X-User-Role` injetados pelo gateway e **não validam o JWT diretamente**.
+
+---
+
+## 🔒 Segurança e privacidade (US-19)
+
+| Requisito (CA) | Como é atendido |
+|---|---|
+| Senhas com hash seguro | BCrypt no `auth-service`; a senha em texto puro nunca é persistida |
+| Autenticação com expiração configurável | JWT assinado (HS384) com `jwt.expiration` configurável em `application.properties`; renovação via `POST /api/auth/refresh` sem precisar logar de novo |
+| Sessão revogável | `POST /api/auth/logout` invalida o refresh token armazenado |
+| Direito ao esquecimento (LGPD) | `DELETE /api/auth/usuarios/deletar` remove a conta e os dados associados |
+| Aceite de termos no cadastro | `POST /api/auth/registrar` exige `termosAceitos: true`; o cadastro é rejeitado sem isso |
+| Comunicação criptografada (HTTPS/TLS) | Fora do escopo do ambiente local de desenvolvimento (sem certificado configurado); em produção ficaria a cargo de um proxy reverso (nginx/load balancer) na frente do `api-gateway` |
 
 ---
 
@@ -421,6 +448,31 @@ SHOW TABLES;
 | `ifsp_algorithm` | `exercicios`, `casos_teste`, `submissoes`, `resultados_caso_teste` |
 | `ifsp_gamification` | `pontos_evento`, `conquista`, `usuario_conquista` |
 | `ifsp_suporte` | `chamado`, `resposta_chamado`, `faq_entrada` |
+
+---
+
+## 🧪 Testes
+
+Cada serviço tem testes unitários (JUnit 5 + Mockito) na camada de `service`, isolando a regra de negócio do banco de dados. Para rodar os testes de um serviço:
+
+```powershell
+cd auth-service; .\mvnw.cmd test
+```
+```bash
+cd auth-service && ./mvnw test
+```
+
+| Serviço | Classes de teste | Cobre |
+|---|---|---|
+| `auth-service` | `RefreshTokenServiceTest`, `PreferenciaServiceTest` | Geração/renovação/revogação de refresh token; CRUD de preferências de aprendizado (US-14) |
+| `forum-service` | `TopicoServiceTest`, `ComentarioServiceTest`, `LikeServiceTest`, `SeguimentoServiceTest`, `MetricaServiceTest`, `PontuacaoServiceTest` | Criação/moderação de tópicos, título duplicado, comentários, toggle de like, seguir/desseguir, painel pedagógico do fórum (US-20), hooks de pontuação (US-12) |
+| `algorithm-service` | `ExercicioServiceTest`, `SubmissaoServiceTest`, `PainelPedagogicoServiceTest` | Cadastro de exercício (rascunho/publicação, validação de moderador), veredito da submissão por comparação de saídas, painel de exercícios com maior taxa de erro (US-20) |
+| `gamification-service` | `PontuacaoServiceTest`, `RankingServiceTest` | Tabela de pontos por tipo de evento, idempotência, desbloqueio de badges, ranking por escopo/período |
+| `personalization-service` | `SugestaoServiceTest` | Sugestões filtradas por preferências e fallback quando um serviço dependente está fora do ar |
+| `suporte-service` | `ChamadoServiceTest`, `FaqServiceTest` | Geração de protocolo, regras de acesso (dono/moderador), chamado encerrado, flag de urgência (+48h) |
+| `api-gateway` | — | Sem testes unitários (módulo fino de roteamento + filtro de JWT); validado manualmente via Postman |
+
+> ℹ️ As classes `*ApplicationTests` (`@SpringBootTest`, um por serviço) sobem o contexto Spring completo e exigem o MySQL do serviço já rodando — são smoke tests de integração, não unitários. Para rodar só os testes unitários sem subir banco: `./mvnw test -Dtest='*ServiceTest'`.
 
 ---
 

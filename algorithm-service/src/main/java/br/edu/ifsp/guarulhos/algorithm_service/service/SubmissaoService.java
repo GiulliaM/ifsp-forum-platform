@@ -24,8 +24,8 @@ import java.util.List;
 
 /**
  * Regras de negócio das submissões. Implementa o juiz por comparação, que confronta as
- * saídas enviadas com as esperadas de cada caso (US-08), mantém o histórico (US-08 CA5)
- * e fornece o feedback detalhado por caso de teste ao dono da submissão (US-09).
+ * saídas enviadas com as esperadas de cada caso, mantém o histórico
+ * e fornece o feedback detalhado por caso de teste ao dono da submissão.
  */
 @Service
 @RequiredArgsConstructor

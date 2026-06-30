@@ -9,10 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Popula a FAQ na primeira inicialização do serviço (US-16, CA4 — exibida antes da
- * abertura do chamado). Cada entrada é inserida somente se a pergunta ainda não existir.
- */
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements ApplicationRunner {

@@ -6,10 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-/**
- * Acesso às submissões, atendendo ao histórico do usuário (US-08) e às contagens que
- * alimentam a taxa de acerto e o status pessoal do catálogo (US-07).
- */
 public interface SubmissaoRepository extends JpaRepository<Submissao, Long> {
 
     List<Submissao> findByUsuarioIdOrderByCriadoEmDesc(Long usuarioId);

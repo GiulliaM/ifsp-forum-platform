@@ -20,11 +20,6 @@ public class SugestaoService {
     private final ComentarioRepository comentarioRepository;
     private final TopicoService topicoService;
 
-    /*
-    * US-13 - sugestões baseadas nas categorias em que o usuário já participou
-    * (criou tópico ou comentou). Para novos usuários sem histórico, retorna
-    * os 10 tópicos mais recentes em aberto.
-    * */
     public List<TopicoResponse> sugeridos(Long usuarioId) {
         Set<String> categorias = new HashSet<>();
         categorias.addAll(topicoRepository.findCategoriasByAutorId(usuarioId));

@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Resposta de uma submissão. Sem a lista de resultados serve ao histórico (US-08 CA5);
- * com a lista preenchida serve ao feedback detalhado (US-09).
+ * Resposta de uma submissão. Sem a lista de resultados serve ao histórico;
+ * com a lista preenchida serve ao feedback detalhado.
  */
 @Data
 @Builder

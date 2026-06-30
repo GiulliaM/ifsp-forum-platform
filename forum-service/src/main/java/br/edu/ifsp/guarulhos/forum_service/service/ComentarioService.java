@@ -22,7 +22,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ComentarioService {
 
-    // Janela de tempo em que o autor ainda pode editar ou excluir o comentário
     private static final long MINUTOS_PARA_EDITAR = 30;
 
     private final ComentarioRepository comentarioRepository;
@@ -30,10 +29,6 @@ public class ComentarioService {
     private final LikeRepository likeRepository;
     private final PontuacaoService pontuacaoService;
 
-    /*
-    * US-02 - comentar em um tópico. Se vier parentId, é uma resposta a outro
-    * comentário (thread). Não deixa comentar em tópico encerrado.
-    * */
     public ComentarioResponse criar(Long topicoId, ComentarioRequest request, Long autorId){
         Topico topico = topicoRepository.findById(topicoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Tópico não encontrado"));
@@ -66,9 +61,6 @@ public class ComentarioService {
                 .toList();
     }
 
-    /*
-    * US-02 - editar o próprio comentário, dentro do limite de 30 minutos.
-    * */
     public ComentarioResponse editar(Long id, ComentarioRequest request, Long autorId){
         Comentario comentario = buscarValidandoAutor(id, autorId);
         validarPrazo(comentario);
@@ -79,9 +71,6 @@ public class ComentarioService {
         return montarResponse(comentario);
     }
 
-    /*
-    * US-02 - excluir o próprio comentário, dentro do limite de 30 minutos.
-    * */
     public void deletar(Long id, Long autorId){
         Comentario comentario = buscarValidandoAutor(id, autorId);
         validarPrazo(comentario);

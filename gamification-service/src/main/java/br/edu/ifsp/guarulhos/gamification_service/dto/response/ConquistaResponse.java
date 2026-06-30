@@ -5,9 +5,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * Conquista desbloqueada exibida no perfil do usuário (US-12, CA3).
- */
 @Data
 @Builder
 public class ConquistaResponse {

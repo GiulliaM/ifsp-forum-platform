@@ -6,9 +6,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * Linha do extrato de pontos do usuário (US-12, CA2): o que rendeu, quanto e quando.
- */
 @Data
 @Builder
 public class PontosEventoResponse {

@@ -20,10 +20,6 @@ public class LikeService {
     private final ComentarioRepository comentarioRepository;
     private final PontuacaoService pontuacaoService;
 
-    /*
-    * US-03 - curtir um tópico. Funciona como alternância: se o usuário já curtiu,
-    * clicar de novo remove o like. Retorna o total de likes atualizado.
-    * */
     public long alternarLikeTopico(Long topicoId, Long usuarioId) {
         Topico topico = topicoRepository.findById(topicoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Tópico não encontrado"));
@@ -31,9 +27,6 @@ public class LikeService {
         return likeRepository.countByTipoAndReferenciaId(TipoLike.TOPICO, topicoId);
     }
 
-    /*
-    * US-03 - curtir um comentário (mesma lógica de alternância).
-    * */
     public long alternarLikeComentario(Long comentarioId, Long usuarioId) {
         Comentario comentario = comentarioRepository.findById(comentarioId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Comentário não encontrado"));
@@ -44,10 +37,9 @@ public class LikeService {
     private void alternar(Long usuarioId, TipoLike tipo, Long referenciaId, Long autorConteudo) {
         likeRepository.findByUsuarioIdAndTipoAndReferenciaId(usuarioId, tipo, referenciaId)
                 .ifPresentOrElse(
-                        like -> {
-                            likeRepository.delete(like);
-                            pontuacaoService.removerPontoLike(autorConteudo, referenciaId, usuarioId);
-                        },
+                        // o gamification-service ainda não expõe estorno de pontos (ver SPRINT2.md);
+                        // ao tirar o like, o ponto já concedido permanece.
+                        likeRepository::delete,
                         () -> {
                             likeRepository.save(Like.builder()
                                     .usuarioId(usuarioId)

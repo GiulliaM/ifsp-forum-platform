@@ -33,10 +33,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Testes unitários das regras do catálogo de exercícios: permissão de cadastro,
- * persistência de rascunho/publicado e cálculo de taxa de acerto e status pessoal.
- */
 @ExtendWith(MockitoExtension.class)
 class ExercicioServiceTest {
 

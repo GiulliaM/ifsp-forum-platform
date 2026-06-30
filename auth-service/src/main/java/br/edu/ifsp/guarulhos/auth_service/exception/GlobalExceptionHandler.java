@@ -15,11 +15,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
-/**
- * Captura as exceções lançadas pela service, pela validação dos DTOs e pelos erros
- * comuns do Spring, devolvendo sempre um JSON padronizado com o status HTTP correto,
- * em vez da página de erro padrão do framework.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

@@ -19,15 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-/**
- * Regras de pontuação (US-12): valora os eventos recebidos dos demais serviços, garante
- * idempotência (o mesmo fato não pontua duas vezes) e dispara o desbloqueio de conquistas.
- */
 @Service
 @RequiredArgsConstructor
 public class PontuacaoService {
 
-    // Tabela de pontos definida na US-12.
     private static final int PONTOS_TOPICO = 5;
     private static final int PONTOS_COMENTARIO = 3;
     private static final int PONTOS_LIKE = 2;
@@ -41,7 +36,6 @@ public class PontuacaoService {
 
     @Transactional
     public void registrarEvento(EventoPontosRequest request){
-        // Idempotência: se o mesmo fato já pontuou, ignora silenciosamente.
         boolean jaPontuado = pontosEventoRepository
                 .existsByTipoAndReferenciaIdAndUsuarioId(request.getTipo(), request.getReferenciaId(), request.getUsuarioId());
         if (jaPontuado){

@@ -34,6 +34,8 @@ class ComentarioServiceTest {
     private TopicoRepository topicoRepository;
     @Mock
     private LikeRepository likeRepository;
+    @Mock
+    private PontuacaoService pontuacaoService;
     @InjectMocks
     private ComentarioService comentarioService;
 

@@ -1,80 +1,51 @@
 package br.edu.ifsp.guarulhos.forum_service.service;
 
-import br.edu.ifsp.guarulhos.forum_service.dto.response.RankingItemResponse;
-import br.edu.ifsp.guarulhos.forum_service.model.Pontuacao;
-import br.edu.ifsp.guarulhos.forum_service.model.enums.TipoPontuacao;
-import br.edu.ifsp.guarulhos.forum_service.repository.PontuacaoRepository;
+import br.edu.ifsp.guarulhos.forum_service.dto.request.EventoPontosRequest;
+import br.edu.ifsp.guarulhos.forum_service.model.enums.TipoEventoPontos;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Notifica o gamification-service sobre ações pontuáveis do fórum. O cálculo do
+ * valor em pontos e a idempotência são responsabilidade do gamification-service.
+ */
 @Service
 @RequiredArgsConstructor
 public class PontuacaoService {
 
-    private static final int PONTOS_CRIAR_TOPICO = 5;
-    private static final int PONTOS_COMENTAR = 3;
-    private static final int PONTOS_RECEBER_LIKE = 2;
+    private static final Logger log = LoggerFactory.getLogger(PontuacaoService.class);
 
-    private final PontuacaoRepository pontuacaoRepository;
+    private final RestClient restClient;
+
+    @Value("${services.gamification-url}")
+    private String gamificationUrl;
 
     public void registrarTopico(Long autorId, Long topicoId) {
-        pontuacaoRepository.save(Pontuacao.builder()
-                .usuarioId(autorId)
-                .pontos(PONTOS_CRIAR_TOPICO)
-                .tipo(TipoPontuacao.CRIAR_TOPICO)
-                .referenciaId(topicoId)
-                .build());
+        registrarEvento(TipoEventoPontos.TOPICO_CRIADO, autorId, topicoId);
     }
 
     public void registrarComentario(Long autorId, Long comentarioId) {
-        pontuacaoRepository.save(Pontuacao.builder()
-                .usuarioId(autorId)
-                .pontos(PONTOS_COMENTAR)
-                .tipo(TipoPontuacao.COMENTAR)
-                .referenciaId(comentarioId)
-                .build());
+        registrarEvento(TipoEventoPontos.COMENTARIO, autorId, comentarioId);
     }
 
     public void registrarLike(Long autorConteudo, Long referenciaId, Long curtidorId) {
-        boolean jaRegistrado = pontuacaoRepository
-                .findByTipoAndReferenciaIdAndCurtidorId(TipoPontuacao.RECEBER_LIKE, referenciaId, curtidorId)
-                .isPresent();
-        if (!jaRegistrado) {
-            pontuacaoRepository.save(Pontuacao.builder()
-                    .usuarioId(autorConteudo)
-                    .pontos(PONTOS_RECEBER_LIKE)
-                    .tipo(TipoPontuacao.RECEBER_LIKE)
-                    .referenciaId(referenciaId)
-                    .curtidorId(curtidorId)
-                    .build());
+        registrarEvento(TipoEventoPontos.LIKE_RECEBIDO, autorConteudo, referenciaId);
+    }
+
+    private void registrarEvento(TipoEventoPontos tipo, Long usuarioId, Long referenciaId) {
+        try {
+            restClient.post()
+                    .uri(gamificationUrl + "/api/pontos/eventos")
+                    .body(new EventoPontosRequest(tipo, usuarioId, referenciaId))
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.warn("Falha ao registrar evento de pontuacao ({}, usuarioId={}, referenciaId={}): {}",
+                    tipo, usuarioId, referenciaId, e.getMessage());
         }
-    }
-
-    public void removerPontoLike(Long autorConteudo, Long referenciaId, Long curtidorId) {
-        pontuacaoRepository
-                .findByTipoAndReferenciaIdAndCurtidorId(TipoPontuacao.RECEBER_LIKE, referenciaId, curtidorId)
-                .ifPresent(pontuacaoRepository::delete);
-    }
-
-    public long totalPontos(Long usuarioId) {
-        return pontuacaoRepository.sumPontosByUsuarioId(usuarioId);
-    }
-
-    public List<RankingItemResponse> ranking(int limite) {
-        List<Object[]> raw = pontuacaoRepository.findRanking(PageRequest.of(0, limite));
-        List<RankingItemResponse> resultado = new ArrayList<>();
-        for (int i = 0; i < raw.size(); i++) {
-            Object[] row = raw.get(i);
-            resultado.add(new RankingItemResponse(
-                    i + 1,
-                    (Long) row[0],
-                    ((Number) row[1]).longValue()
-            ));
-        }
-        return resultado;
     }
 }

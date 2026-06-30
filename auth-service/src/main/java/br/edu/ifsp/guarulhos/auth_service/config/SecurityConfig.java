@@ -14,11 +14,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    /*
-    * Função para desabilitar o csrf e usar apenas o jwt valido para as rotas.
-    * Define que o servidor não guarda sessão - cada requisição puxa o jwt
-    * */
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
@@ -32,9 +27,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /*
-    * Função para criptografia das senhas
-    * */
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();

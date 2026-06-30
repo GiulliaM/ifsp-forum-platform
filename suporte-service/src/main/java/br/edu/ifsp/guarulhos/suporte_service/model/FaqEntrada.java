@@ -3,9 +3,6 @@ package br.edu.ifsp.guarulhos.suporte_service.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * Entrada do catálogo de FAQ exibido antes da abertura de um chamado (US-16, CA4).
- */
 @Entity
 @Table(name = "faq_entrada")
 @Getter

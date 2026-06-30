@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Endpoints de pontuação (US-12): recebe os eventos pontuáveis dos demais serviços e expõe
- * o extrato de pontos e as conquistas do usuário autenticado.
- */
 @RestController
 @RequestMapping("/api/pontos")
 @RequiredArgsConstructor

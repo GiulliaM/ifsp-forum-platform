@@ -19,7 +19,6 @@ public class UsuarioController {
 
     private final SeguimentoService seguimentoService;
 
-    // US-06 - listar os tópicos que o usuário logado segue, com filtro por categoria e ordenação por data
     @GetMapping("/seguidos")
     public ResponseEntity<List<TopicoResponse>> topicosSeguidos(
             @RequestHeader("X-User-Id") Long usuarioId,

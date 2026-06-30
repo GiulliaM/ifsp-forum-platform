@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Endpoint público do ranking de usuários (US-11), com filtros por escopo e período.
- */
 @RestController
 @RequestMapping("/api/ranking")
 @RequiredArgsConstructor

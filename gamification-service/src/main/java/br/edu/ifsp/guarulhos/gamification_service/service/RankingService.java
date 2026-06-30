@@ -16,17 +16,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Monta o ranking de usuários (US-11) a partir da soma de pontos, aplicando os filtros de
- * escopo (geral/fórum/algoritmos) e período (semana/mês/total).
- */
 @Service
 @RequiredArgsConstructor
 public class RankingService {
 
     private static final int TOP = 50;
 
-    // Quais tipos de evento contam em cada escopo do ranking.
     private static final Set<TipoEvento> TIPOS_FORUM =
             Set.of(TipoEvento.TOPICO_CRIADO, TipoEvento.COMENTARIO, TipoEvento.LIKE_RECEBIDO);
     private static final Set<TipoEvento> TIPOS_ALGORITMOS =
@@ -49,7 +44,6 @@ public class RankingService {
                         .pontuacao(linha.getTotal())
                         .build())
                 .toList();
-        // TODO US-11 CA3: anexar a posição do usuário autenticado quando ele estiver fora do top 50.
     }
 
     private Set<TipoEvento> tiposDoEscopo(Escopo escopo){

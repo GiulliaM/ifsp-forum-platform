@@ -9,10 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Popula o catálogo de badges na primeira inicialização do serviço.
- * Cada badge é inserida somente se o criterio ainda não existir no banco.
- */
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements ApplicationRunner {

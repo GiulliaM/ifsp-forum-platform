@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Dados de uma submissão de solução. Como o juiz é por comparação, além do código o
- * estudante envia a lista de saídas produzidas, uma por caso de teste, na ordem (US-08).
+ * estudante envia a lista de saídas produzidas, uma por caso de teste, na ordem.
  */
 @Data
 public class SubmissaoRequest {
