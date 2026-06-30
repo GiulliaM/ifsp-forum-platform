@@ -1,71 +1,702 @@
 {
   "info": {
     "_postman_id": "7b19e8bf-f083-4446-8243-c8ecbc17b230",
-    "name": "ifsp-forum",
+    "name": "IFSP Forum Platform",
+    "description": "Plataforma integrada de fórum e algoritmos — disciplina APIs e Microsserviços, IFSP Guarulhos ADS 2026.\n\nTodas as requisições passam pelo **api-gateway** (`:8080`), que valida o JWT e injeta `X-User-Id` e `X-User-Role` nos serviços internos automaticamente.\n\n**Como usar:**\n1. Execute **Cadastro de usuário** ou **Login**\n2. O token JWT e o refresh token são salvos automaticamente nas variáveis da coleção\n3. Todas as requisições autenticadas já usam `{{token}}` via Bearer",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "51583384",
     "_collection_link": "https://go.postman.co/collection/51583384-7b19e8bf-f083-4446-8243-c8ecbc17b230?source=collection_link"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8080", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "refresh_token", "value": "", "type": "string" }
+  ],
   "item": [
     {
-      "name": "Cadastro de usuário",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"nome\": \"Giullia Maria\",\n  \"email\": \"giulliamaria@ifsp.edu.br\",\n  \"senha\": \"123456\",\n  \"termosAceitos\": true\n}",
-          "options": {
-            "raw": {
-              "language": "json"
+      "name": "🔐 Auth Service",
+      "description": "Autenticação, refresh token e preferências de aprendizado (US-19, US-14).",
+      "item": [
+        {
+          "name": "Cadastro de usuário",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var resp = pm.response.json();",
+                  "if (resp.token) {",
+                  "  pm.collectionVariables.set('token', resp.token);",
+                  "  pm.collectionVariables.set('refresh_token', resp.refreshToken);",
+                  "  console.log('Token salvo automaticamente.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
             }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8083/api/auth/registrar",
-          "protocol": "http",
-          "host": [
-            "localhost"
           ],
-          "port": "8083",
-          "path": [
-            "api",
-            "auth",
-            "registrar"
-          ]
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Giullia Maria\",\n  \"email\": \"giulliamaria@ifsp.edu.br\",\n  \"senha\": \"123456\",\n  \"termosAceitos\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/registrar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "registrar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var resp = pm.response.json();",
+                  "if (resp.token) {",
+                  "  pm.collectionVariables.set('token', resp.token);",
+                  "  pm.collectionVariables.set('refresh_token', resp.refreshToken);",
+                  "  console.log('Token salvo. Expira em ' + resp.expiresIn + 's.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"giulliamaria@ifsp.edu.br\",\n  \"senha\": \"123456\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Renovar token (refresh)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var resp = pm.response.json();",
+                  "if (resp.token) {",
+                  "  pm.collectionVariables.set('token', resp.token);",
+                  "  pm.collectionVariables.set('refresh_token', resp.refreshToken);",
+                  "  console.log('Token renovado com sucesso.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "refresh"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar preferências de aprendizado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/usuarios/preferencias",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "usuarios", "preferencias"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Salvar preferências de aprendizado",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nivel\": \"INTERMEDIARIO\",\n  \"interesses\": [\"backend\", \"algoritmos\", \"estruturas de dados\"],\n  \"linguagens\": [\"Java\", \"Python\"]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/usuarios/preferencias",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "usuarios", "preferencias"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir conta",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/usuarios/deletar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "usuarios", "deletar"]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "Login de usuário",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"email\": \"giulliamaria@ifsp.edu.br\",\n  \"senha\": \"123456\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
+      "name": "💬 Fórum",
+      "description": "Tópicos, comentários, likes e seguimentos (US-01 a US-06).",
+      "item": [
+        {
+          "name": "Tópicos",
+          "item": [
+            {
+              "name": "Listar tópicos",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/topicos",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Criar tópico",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"titulo\": \"Como funciona uma árvore binária?\",\n  \"descricao\": \"Estou com dificuldade em entender a estrutura de uma árvore binária e como percorrê-la em ordem.\",\n  \"categoria\": \"Estruturas de Dados\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/topicos",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar tópico por ID",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/topicos/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos", "1"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Listar tópicos seguidos",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/topicos/seguidos?ordem=desc",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos", "seguidos"],
+                  "query": [
+                    { "key": "categoria", "value": "", "disabled": true },
+                    { "key": "ordem", "value": "desc" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Fixar / desafixar tópico",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/topicos/1/fixar",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos", "1", "fixar"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Encerrar tópico",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/topicos/1/encerrar",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos", "1", "encerrar"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Deletar tópico",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/topicos/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos", "1"]
+                }
+              },
+              "response": []
             }
-          }
+          ]
         },
-        "url": {
-          "raw": "http://localhost:8083/api/auth/login",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8083",
-          "path": [
-            "api",
-            "auth",
-            "login"
+        {
+          "name": "Comentários",
+          "item": [
+            {
+              "name": "Comentar em tópico",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"conteudo\": \"Uma árvore binária é uma estrutura onde cada nó tem no máximo dois filhos: esquerdo e direito. Para percorrer em ordem (in-order), visita-se: esquerda → raiz → direita.\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/topicos/1/comentarios",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos", "1", "comentarios"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Listar comentários do tópico",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/topicos/1/comentarios",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos", "1", "comentarios"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Editar comentário",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"conteudo\": \"Correção: para percorrer em pré-ordem visita-se raiz → esquerda → direita.\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/comentarios/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "comentarios", "1"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Excluir comentário",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/comentarios/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "comentarios", "1"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Likes",
+          "item": [
+            {
+              "name": "Like em tópico",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/topicos/1/like",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos", "1", "like"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Like em comentário",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/comentarios/1/like",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "comentarios", "1", "like"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Seguimentos",
+          "item": [
+            {
+              "name": "Seguir tópico",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/topicos/1/seguir",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos", "1", "seguir"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Deixar de seguir tópico",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/topicos/1/seguir",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "topicos", "1", "seguir"]
+                }
+              },
+              "response": []
+            }
           ]
         }
-      },
-      "response": []
+      ]
+    },
+    {
+      "name": "⚙️ Algoritmos",
+      "description": "Catálogo de exercícios, submissões, feedback e painel pedagógico (US-07 a US-10, US-20).",
+      "item": [
+        {
+          "name": "Exercícios",
+          "item": [
+            {
+              "name": "Listar exercícios",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/exercicios",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "exercicios"],
+                  "query": [
+                    { "key": "dificuldade", "value": "FACIL", "disabled": true },
+                    { "key": "categoria", "value": "Matemática", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Listar exercícios por dificuldade",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/exercicios?dificuldade=MEDIO",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "exercicios"],
+                  "query": [{ "key": "dificuldade", "value": "MEDIO" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Detalhe do exercício",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/exercicios/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "exercicios", "1"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Cadastrar exercício (MODERADOR)",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"titulo\": \"Soma de dois números\",\n  \"enunciado\": \"Leia dois inteiros e imprima a soma.\",\n  \"dificuldade\": \"FACIL\",\n  \"categoria\": \"Matemática\",\n  \"exemploEntrada\": \"2 3\",\n  \"exemploSaida\": \"5\",\n  \"publicar\": true,\n  \"casosTeste\": [\n    { \"entrada\": \"2 3\", \"saidaEsperada\": \"5\", \"oculto\": false },\n    { \"entrada\": \"10 7\", \"saidaEsperada\": \"17\", \"oculto\": true }\n  ]\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/exercicios",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "exercicios"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Painel pedagógico — maior taxa de erro (MODERADOR)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/exercicios/painel-pedagogico?limite=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "exercicios", "painel-pedagogico"],
+                  "query": [{ "key": "limite", "value": "10" }]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Submissões",
+          "item": [
+            {
+              "name": "Submeter solução",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"exercicioId\": 1,\n  \"linguagem\": \"JAVA\",\n  \"codigo\": \"import java.util.Scanner;\\npublic class Main {\\n  public static void main(String[] args) {\\n    Scanner sc = new Scanner(System.in);\\n    System.out.println(sc.nextInt() + sc.nextInt());\\n  }\\n}\",\n  \"saidas\": [\"5\", \"17\"]\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/submissoes",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "submissoes"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Histórico de submissões",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/submissoes/me",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "submissoes", "me"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Feedback da submissão",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/submissoes/1/feedback",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "submissoes", "1", "feedback"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🏆 Gamificação",
+      "description": "Pontuação por contribuição, badges e ranking de usuários (US-11, US-12).",
+      "item": [
+        {
+          "name": "Registrar evento de pontos (interno)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"EXERCICIO_RESOLVIDO\",\n  \"usuarioId\": 1,\n  \"referenciaId\": 1,\n  \"dificuldade\": \"MEDIO\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pontos/eventos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pontos", "eventos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Extrato de pontos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pontos/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pontos", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Minhas conquistas (badges)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pontos/me/conquistas",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pontos", "me", "conquistas"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ranking geral — total",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/ranking?escopo=GERAL&periodo=TOTAL",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ranking"],
+              "query": [
+                { "key": "escopo", "value": "GERAL" },
+                { "key": "periodo", "value": "TOTAL" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ranking do fórum — mensal",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/ranking?escopo=FORUM&periodo=MES",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ranking"],
+              "query": [
+                { "key": "escopo", "value": "FORUM" },
+                { "key": "periodo", "value": "MES" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ranking de algoritmos — semanal",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/ranking?escopo=ALGORITMOS&periodo=SEMANA",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ranking"],
+              "query": [
+                { "key": "escopo", "value": "ALGORITMOS" },
+                { "key": "periodo", "value": "SEMANA" }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🎯 Personalização",
+      "description": "Sugestões personalizadas de tópicos e exercícios com base nas preferências do usuário (US-13).",
+      "item": [
+        {
+          "name": "Sugestões personalizadas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/sugestoes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sugestoes"]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
