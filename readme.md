@@ -96,13 +96,24 @@ spring.datasource.password=SUA_SENHA_AQUI
 
 Abra cada pasta no IntelliJ e clique em **Run**, ou pelo terminal:
 
+Abra um terminal separado para cada serviço e execute:
+
+```powershell
+# PowerShell (Windows)
+cd auth-service;            .\mvnw.cmd spring-boot:run
+cd forum-service;           .\mvnw.cmd spring-boot:run
+cd algorithm-service;       .\mvnw.cmd spring-boot:run
+cd gamification-service;    .\mvnw.cmd spring-boot:run
+cd personalization-service; .\mvnw.cmd spring-boot:run
+```
+
 ```bash
-# Em terminais separados — suba o auth-service primeiro
-cd auth-service               && mvn spring-boot:run
-cd forum-service              && mvn spring-boot:run
-cd algorithm-service          && mvn spring-boot:run
-cd gamification-service       && mvn spring-boot:run
-cd personalization-service    && mvn spring-boot:run
+# bash / Git Bash / Linux / macOS
+cd auth-service           && ./mvnw spring-boot:run
+cd forum-service          && ./mvnw spring-boot:run
+cd algorithm-service      && ./mvnw spring-boot:run
+cd gamification-service   && ./mvnw spring-boot:run
+cd personalization-service && ./mvnw spring-boot:run
 ```
 
 > ⚠️ Suba o `auth-service` antes dos outros — ele é responsável pela geração do JWT.
