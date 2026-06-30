@@ -19,20 +19,20 @@ Inspirada no Stack Overflow e no LeetCode, a plataforma oferece fórum colaborat
 ## 🏗️ Arquitetura
 
 ```
-                        ┌─────────────────┐
-                        │   api-gateway   │  :8080
-                        │  (roteamento +  │
-                        │  validação JWT) │
-                        └────────┬────────┘
-                                 │
-          ┌──────────────────────┼──────────────────────┬──────────────────────┐
-          │                      │                      │                      │
-   ┌──────▼──────┐       ┌───────▼──────┐      ┌───────▼──────┐      ┌────────▼───────┐
-   │auth-service │       │forum-service │      │algorithm-    │      │gamification-   │
-   │   :8081     │       │   :8082      │      │service :8083 │      │service  :8084  │
-   │             │       │              │      │              │      │                │
-   │ ifsp_auth   │       │ ifsp_forum   │      │ifsp_algorithm│      │ifsp_gamificati │
-   └─────────────┘       └──────────────┘      └──────────────┘      └────────────────┘
+                                  ┌─────────────────┐
+                                  │   api-gateway   │  :8080
+                                  │  (roteamento +  │
+                                  │  validação JWT) │
+                                  └────────┬────────┘
+                                           │
+          ┌──────────────┬─────────────────┼──────────────────┬────────────────────┐
+          │              │                 │                  │                    │
+   ┌──────▼──────┐  ┌────▼─────────┐  ┌───▼──────────┐  ┌───▼────────────┐  ┌────▼──────────────┐
+   │auth-service │  │forum-service │  │algorithm-    │  │gamification-   │  │personalization-   │
+   │   :8081     │  │   :8082      │  │service :8083 │  │service  :8084  │  │service     :8085  │
+   │             │  │              │  │              │  │                │  │                   │
+   │ ifsp_auth   │  │ ifsp_forum   │  │ifsp_algorithm│  │ifsp_gamificati │  │   (sem banco)     │
+   └─────────────┘  └──────────────┘  └──────────────┘  └────────────────┘  └───────────────────┘
 ```
 
 Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre serviços passa pelo gateway, que valida o JWT e injeta `X-User-Id` e `X-User-Role` nos headers.
@@ -46,10 +46,11 @@ Cada serviço tem seu **próprio banco de dados MySQL**. A comunicação entre s
 | Serviço | Porta | Banco | User Stories | Status |
 |---------|-------|-------|--------------|--------|
 | `api-gateway` | 8080 | — | Roteamento + JWT | ✅ Funcional (Spring Boot 3.2.5) |
-| `auth-service` | 8081 | `ifsp_auth` | US-19 | ✅ Concluído |
+| `auth-service` | 8081 | `ifsp_auth` | US-19, US-14 | ✅ Concluído |
 | `forum-service` | 8082 | `ifsp_forum` | US-01 a US-06 | ✅ Concluído |
-| `algorithm-service` | 8083 | `ifsp_algorithm` | US-07, 08, 09, 10 | ✅ Concluído |
+| `algorithm-service` | 8083 | `ifsp_algorithm` | US-07, 08, 09, 10, US-20 | ✅ Concluído |
 | `gamification-service` | 8084 | `ifsp_gamification` | US-11, US-12 | ✅ Concluído |
+| `personalization-service` | 8085 | — | US-13 | ✅ Concluído |
 
 ---
 
@@ -80,6 +81,8 @@ CREATE DATABASE ifsp_algorithm;
 CREATE DATABASE ifsp_gamification;
 ```
 
+> ℹ️ O `personalization-service` não usa banco de dados — agrega dados dos outros serviços via HTTP.
+
 ### 3. Configure o `application.properties` de cada serviço
 
 O arquivo fica em `src/main/resources/application.properties` de cada serviço. Troque a senha se necessário:
@@ -95,10 +98,11 @@ Abra cada pasta no IntelliJ e clique em **Run**, ou pelo terminal:
 
 ```bash
 # Em terminais separados — suba o auth-service primeiro
-cd auth-service           && mvn spring-boot:run
-cd forum-service          && mvn spring-boot:run
-cd algorithm-service      && mvn spring-boot:run
-cd gamification-service   && mvn spring-boot:run
+cd auth-service               && mvn spring-boot:run
+cd forum-service              && mvn spring-boot:run
+cd algorithm-service          && mvn spring-boot:run
+cd gamification-service       && mvn spring-boot:run
+cd personalization-service    && mvn spring-boot:run
 ```
 
 > ⚠️ Suba o `auth-service` antes dos outros — ele é responsável pela geração do JWT.
@@ -128,7 +132,11 @@ Os outros serviços leem os headers `X-User-Id` e `X-User-Role` injetados pelo g
 | Método | Rota | Descrição | Auth? |
 |--------|------|-----------|-------|
 | POST | `/api/auth/registrar` | Cadastro de novo usuário (sempre ESTUDANTE) | ❌ |
-| POST | `/api/auth/login` | Login → retorna JWT | ❌ |
+| POST | `/api/auth/login` | Login → retorna JWT + refresh token | ❌ |
+| POST | `/api/auth/refresh` | Renova o access token via refresh token | ❌ |
+| POST | `/api/auth/logout` | Revoga o refresh token (encerra sessão) | ❌ |
+| GET | `/api/auth/usuarios/preferencias` | Retorna preferências de aprendizado | ✅ |
+| PUT | `/api/auth/usuarios/preferencias` | Salva/atualiza preferências de aprendizado | ✅ |
 | DELETE | `/api/auth/usuarios/deletar` | Excluir conta (LGPD) | ✅ |
 
 **Exemplo de cadastro:**
@@ -146,9 +154,22 @@ POST /api/auth/registrar
 ```json
 {
   "token": "eyJhbGciOiJIUzM4NCJ9...",
+  "refreshToken": "a3f2c1d0-...",
+  "expiresIn": 86400,
   "nome": "João Silva",
   "email": "joao@ifsp.edu.br",
   "perfil": "ESTUDANTE"
+}
+```
+
+**Exemplo de preferências (US-14):**
+```json
+PUT /api/auth/usuarios/preferencias
+Headers: X-User-Id: 1
+{
+  "nivel": "INTERMEDIARIO",
+  "interesses": ["backend", "algoritmos"],
+  "linguagens": ["Java", "Python"]
 }
 ```
 
@@ -190,9 +211,10 @@ Headers: X-User-Id: 1, X-User-Role: ESTUDANTE
 
 | Método | Rota | Descrição | Auth? | Role |
 |--------|------|-----------|-------|------|
-| GET | `/api/exercicios` | Listar exercícios | ❌ | — |
+| GET | `/api/exercicios` | Listar exercícios (filtros: `?dificuldade=&categoria=`) | ❌ | — |
 | GET | `/api/exercicios/{id}` | Detalhe do exercício | ❌ | — |
 | POST | `/api/exercicios` | Cadastrar exercício | ✅ | MODERADOR |
+| GET | `/api/exercicios/painel-pedagogico` | Top N exercícios com maior taxa de erro (US-20) | ✅ | MODERADOR |
 | POST | `/api/submissoes` | Submeter solução | ✅ | ESTUDANTE+ |
 | GET | `/api/submissoes/me` | Histórico de submissões | ✅ | ESTUDANTE+ |
 | GET | `/api/submissoes/{id}/feedback` | Feedback detalhado | ✅ | Dono |
@@ -227,6 +249,31 @@ Headers: X-User-Id: 1, X-User-Role: ESTUDANTE
   "linguagem": "JAVA",
   "codigo": "public class Main { ... }",
   "saidas": ["5", "17"]
+}
+```
+
+---
+
+### Personalization Service (`localhost:8085`)
+
+| Método | Rota | Descrição | Auth? |
+|--------|------|-----------|-------|
+| GET | `/api/sugestoes` | Sugestões personalizadas de tópicos e exercícios (US-13) | ✅ |
+
+Agrega dados do `auth-service` (preferências), `forum-service` (tópicos por interesse) e `algorithm-service` (exercícios por nível). Retorna até 5 sugestões de cada.
+
+**Exemplo de resposta:**
+```json
+GET /api/sugestoes
+Headers: X-User-Id: 1
+
+{
+  "topicos": [
+    { "id": 3, "titulo": "Dúvida sobre Spring Boot", "categoria": "backend", "totalLikes": 12, "totalComentarios": 4 }
+  ],
+  "exercicios": [
+    { "id": 7, "titulo": "Busca binária", "dificuldade": "MEDIO", "categoria": "algoritmos", "taxaAcerto": 42.5 }
+  ]
 }
 ```
 
@@ -313,7 +360,7 @@ SHOW TABLES;
 
 | Banco | Tabelas |
 |-------|---------|
-| `ifsp_auth` | `usuarios` |
+| `ifsp_auth` | `usuarios`, `refresh_tokens`, `preferencias_usuario`, `usuario_interesses`, `usuario_linguagens` |
 | `ifsp_forum` | `topicos`, `comentarios`, `likes`, `seguimentos` |
 | `ifsp_algorithm` | `exercicios`, `casos_teste`, `submissoes`, `resultados_caso_teste` |
 | `ifsp_gamification` | `pontos_evento`, `conquista`, `usuario_conquista` |
@@ -325,7 +372,7 @@ SHOW TABLES;
 | Sprint | Período | Meta | Status |
 |--------|---------|------|--------|
 | Sprint 1 | até 16/06/2026 | Fórum completo, Seguimento, Catálogo e Submissão de Algoritmos, Segurança | ✅ Concluída |
-| Sprint 2 | 17/06 – 30/06/2026 | Gamificação, Personalização, Suporte, Painel Pedagógico e RNFs | 🔄 |
+| Sprint 2 | 17/06 – 30/06/2026 | Gamificação, Personalização, Suporte, Painel Pedagógico e RNFs | ✅ Concluída |
 
 ---
 

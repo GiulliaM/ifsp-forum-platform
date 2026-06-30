@@ -20,10 +20,10 @@ Responsabilidades por integrante (mesma base da Sprint 1):
 | **US-10** | Cadastrar exercício | algorithm | ✅ Concluído (Sprint 1) |
 | **US-11** | Ranking de usuários | gamificação | ✅ Concluído |
 | **US-12** | Acumular pontos por contribuição + badges | gamificação | ✅ Concluído |
-| **US-19** | Conclusão de segurança: refresh token + expiração configurável | auth | 🔄 Pendente |
-| **US-14** | Preferências de aprendizado (interesses, nível, linguagens) — dado de perfil | auth | 🔄 Pendente |
-| **US-13** | Sugestões personalizadas (tópicos + exercícios) | personalização | 🔄 Pendente |
-| **US-20** | Painel pedagógico — lado algoritmos (exercícios com maior taxa de erro) | algorithm | 🔄 Pendente |
+| **US-19** | Conclusão de segurança: refresh token + expiração configurável | auth | ✅ Concluído |
+| **US-14** | Preferências de aprendizado (interesses, nível, linguagens) — dado de perfil | auth | ✅ Concluído |
+| **US-13** | Sugestões personalizadas (tópicos + exercícios) | personalização | ✅ Concluído |
+| **US-20** | Painel pedagógico — lado algoritmos (exercícios com maior taxa de erro) | algorithm | ✅ Concluído |
 
 ### 🟢 Maria Eduarda — `forum`
 
