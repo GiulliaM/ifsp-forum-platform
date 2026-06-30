@@ -23,6 +23,7 @@ public class TopicoService {
     private final TopicoRepository topicoRepository;
     private final ComentarioRepository comentarioRepository;
     private final LikeRepository likeRepository;
+    private final PontuacaoService pontuacaoService;
 
     /*
     * US-01 - criar um novo tópico de discussão. O autor vem do header X-User-Id
@@ -40,9 +41,11 @@ public class TopicoService {
                 .autorId(autorId)
                 .fixado(false)
                 .encerrado(false)
+                .imageUrl(request.getImageUrl())
                 .build();
 
         topicoRepository.save(topico);
+        pontuacaoService.registrarTopico(autorId, topico.getId());
         return montarResponse(topico);
     }
 
@@ -122,6 +125,7 @@ public class TopicoService {
                 .totalLikes(totalLikes)
                 .totalComentarios(totalComentarios)
                 .criadoEm(topico.getCriadoEm())
+                .imageUrl(topico.getImageUrl())
                 .build();
     }
 }

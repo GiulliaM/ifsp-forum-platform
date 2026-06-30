@@ -22,4 +22,5 @@ public class TopicoResponse {
     private long totalComentarios;
     private LocalDateTime criadoEm;
     private boolean temNovidades;
+    private String imageUrl;
 }

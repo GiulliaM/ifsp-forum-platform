@@ -28,6 +28,7 @@ public class ComentarioService {
     private final ComentarioRepository comentarioRepository;
     private final TopicoRepository topicoRepository;
     private final LikeRepository likeRepository;
+    private final PontuacaoService pontuacaoService;
 
     /*
     * US-02 - comentar em um tópico. Se vier parentId, é uma resposta a outro
@@ -45,6 +46,7 @@ public class ComentarioService {
                 .conteudo(request.getConteudo())
                 .topico(topico)
                 .autorId(autorId)
+                .imageUrl(request.getImageUrl())
                 .build();
 
         if(request.getParentId() != null){
@@ -54,6 +56,7 @@ public class ComentarioService {
         }
 
         comentarioRepository.save(comentario);
+        pontuacaoService.registrarComentario(autorId, comentario.getId());
         return montarResponse(comentario);
     }
 
@@ -112,6 +115,7 @@ public class ComentarioService {
                 .totalLikes(totalLikes)
                 .criadoEm(comentario.getCriadoEm())
                 .editadoEm(comentario.getEditadoEm())
+                .imageUrl(comentario.getImageUrl())
                 .build();
     }
 }

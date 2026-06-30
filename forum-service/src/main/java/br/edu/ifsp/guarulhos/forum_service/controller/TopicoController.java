@@ -3,10 +3,15 @@ package br.edu.ifsp.guarulhos.forum_service.controller;
 import br.edu.ifsp.guarulhos.forum_service.dto.request.ComentarioRequest;
 import br.edu.ifsp.guarulhos.forum_service.dto.request.TopicoRequest;
 import br.edu.ifsp.guarulhos.forum_service.dto.response.ComentarioResponse;
+import br.edu.ifsp.guarulhos.forum_service.dto.response.MetricaCategoriaResponse;
+import br.edu.ifsp.guarulhos.forum_service.dto.response.RankingItemResponse;
 import br.edu.ifsp.guarulhos.forum_service.dto.response.TopicoResponse;
 import br.edu.ifsp.guarulhos.forum_service.service.ComentarioService;
 import br.edu.ifsp.guarulhos.forum_service.service.LikeService;
+import br.edu.ifsp.guarulhos.forum_service.service.MetricaService;
+import br.edu.ifsp.guarulhos.forum_service.service.PontuacaoService;
 import br.edu.ifsp.guarulhos.forum_service.service.SeguimentoService;
+import br.edu.ifsp.guarulhos.forum_service.service.SugestaoService;
 import br.edu.ifsp.guarulhos.forum_service.service.TopicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +30,9 @@ public class TopicoController {
     private final ComentarioService comentarioService;
     private final LikeService likeService;
     private final SeguimentoService seguimentoService;
+    private final PontuacaoService pontuacaoService;
+    private final MetricaService metricaService;
+    private final SugestaoService sugestaoService;
 
     // US-01 - criar tópico
     @PostMapping
@@ -104,5 +112,30 @@ public class TopicoController {
                                                @RequestHeader("X-User-Id") Long usuarioId){
         seguimentoService.deixarDeSeguir(id, usuarioId);
         return ResponseEntity.noContent().build();
+    }
+
+    // US-11 - ranking de pontuação do fórum (top 50 por padrão)
+    @GetMapping("/ranking")
+    public ResponseEntity<List<RankingItemResponse>> ranking(
+            @RequestParam(defaultValue = "50") int limite){
+        return ResponseEntity.ok(pontuacaoService.ranking(limite));
+    }
+
+    // US-13 - tópicos sugeridos com base no histórico do usuário
+    @GetMapping("/sugeridos")
+    public ResponseEntity<List<TopicoResponse>> sugeridos(
+            @RequestHeader("X-User-Id") Long usuarioId){
+        return ResponseEntity.ok(sugestaoService.sugeridos(usuarioId));
+    }
+
+    // US-20 - métricas pedagógicas: categorias com tópicos sem resposta (só moderador)
+    @GetMapping("/metricas/sem-resposta")
+    public ResponseEntity<List<MetricaCategoriaResponse>> metricasSemResposta(
+            @RequestParam(defaultValue = "7") int periodo,
+            @RequestHeader("X-User-Role") String perfil){
+        if (!"MODERADOR".equals(perfil)) {
+            return ResponseEntity.status(403).build();
+        }
+        return ResponseEntity.ok(metricaService.categoriasSemResposta(periodo));
     }
 }
